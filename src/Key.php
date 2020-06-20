@@ -26,12 +26,15 @@ class Key
      */
     private function setValue(array $tags): void
     {
+        if(empty($tags)) {
+            throw new KeyException("Tags cannot be empty!");
+        }
         // validate
-        array_map(function($value) {
+        $tags = array_map(function($value) {
             if (!is_string($value) || preg_match("/^[a-zA-Z0-9\-]+$/", $value)==0) {
                 throw new KeyException("Tags can only be alphanumeric!");
             }
-            return $value;
+            return strtolower($value);
         }, $tags);
         // sort, if number of elements is more than one
         if(count($tags)>1) {

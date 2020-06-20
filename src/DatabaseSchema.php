@@ -22,17 +22,6 @@ class DatabaseSchema
     public function __construct(string $schema)
     {
         $this->path = $schema;
-    }    
-    
-    /**
-     * Checks if schema exists and it is writable
-     * 
-     * @return boolean
-     */
-    public function exists()
-    {
-        $object = new Folder($this->keysFolder);
-        return ($object->exists() && $object->isWritable());
     }
     
     /**
@@ -42,6 +31,17 @@ class DatabaseSchema
     {
         $folder = new Folder($this->path);
         return $folder->create(0777);
+    }
+    
+    /**
+     * Checks if schema exists and it is writable
+     * 
+     * @return boolean
+     */
+    public function exists()
+    {
+        $object = new Folder($this->path);
+        return ($object->exists() && $object->isWritable());
     }
     
     /**
@@ -57,8 +57,10 @@ class DatabaseSchema
     
     /**
      * Deletes all entries in schema
+     * 
+     * @return int Number of entries deleted
      */
-    public function deleteAll(): void
+    public function deleteAll(): int
     {
         $folder = new Folder($this->path);
         return $folder->clear(new All());
@@ -104,6 +106,6 @@ class DatabaseSchema
         $fileDeleter = new ByCapacity($minCapacity, $maxCapacity);
         $folder = new Folder($this->path);
         $folder->clear($fileDeleter);
-        return $fileDeleter->getTotal();
+        return $fileDeleter->commit();
     }
 }

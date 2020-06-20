@@ -26,7 +26,7 @@ class ByTag implements FileDeleter
      */
     public function delete(string $folder, string $file): bool
     {
-        if (preg_match("/(^|_)".$this->tag."(_|$)/", $file)==1) {
+        if (preg_match("/(^|_)".$this->tag."(_|\.json)/", $file)==1) {
             unlink($folder."/".$file);
             return true;
         } else {

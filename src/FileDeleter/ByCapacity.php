@@ -33,35 +33,36 @@ class ByCapacity implements FileDeleter
     {
         if (strpos($file, ".json")!==false) {
             $this->elements[$folder."/".$file] = filemtime($folder."/".$file);
-            if (sizeof($this->elements) == $this->maxCapacity) {
-                asort($this->elements);
-                
-                // pop first COUNT - MIN_CAPACITY elements
-                $i = 0;
-                $elementsToDelete = (sizeof($this->elements)-$this->minCapacity);
-                foreach ($this->elements as $path=>$lastModifiedTime) {
-                    if ($i < $elementsToDelete) {
-                        unlink($path);
-                        unset($this->items[$path]);
-                        $this->deleteCount++;
-                    } else {
-                        break;
-                    }
-                    $i++;
-                }
-                return true;
-            }
         }
         return false;
     }
     
     /**
-     * Gets total of deleted elements
+     * Sorts all entries in database by last modified time and deletes all past capacity
      *
      * @return int Number of elements deleted
      */
-    public function getTotal(): int
+    public function commit(): int
     {
-        return $this->deleteCount;
+        $elementsCount = sizeof($this->elements);
+        if ($elementsCount >= $this->maxCapacity) {
+            asort($this->elements);
+            
+            // start deleting once capacity is reached
+            $i = 0;
+            $elementsToDelete = ($elementsCount-$this->minCapacity);
+            foreach ($this->elements as $path=>$lastModifiedTime) {
+                if ($i < $elementsToDelete) {
+                    unlink($path);
+                    unset($this->elements[$path]);
+                } else {
+                    break;
+                }
+                $i++;
+            }
+            return $elementsToDelete;
+        } else {
+            return 0;
+        }
     }
 }

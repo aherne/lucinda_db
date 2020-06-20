@@ -1,0 +1,25 @@
+{
+    "name": "lucinda/db",
+    "type": "library",
+    "description": "Tag-based key-value store using files instead of RAM to store values",
+    "keywords": ["nosql","database","key-value store"],
+    "license": "MIT",
+    "require": {
+        "php": "^7.1"
+    },
+    "require-dev": {
+    	"lucinda/unit-testing": "^1.0"
+    },
+    "autoload": {
+    	"psr-4": {
+        	"Lucinda\\DB\\": "src/"
+    	}
+    },
+    "authors": [
+        {
+            "name": "Lucian Popescu",
+            "email": "lucian.gabriel.popescu@gmail.com",
+            "role": "Developer"
+        }
+    ]
+}

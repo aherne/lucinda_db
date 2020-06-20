@@ -19,6 +19,21 @@ class File
     }
     
     /**
+     * Writes file to disk
+     *
+     * @param mixed $value Value to save as JSON
+     * @throws JsonException If value could not be encoded
+     */
+    public function write($value): void
+    {
+        $val = json_encode($value);
+        if ($val === false) {
+            throw new JsonException("Value cannot be encoded!");
+        }
+        file_put_contents($this->path, $val);
+    }
+    
+    /**
      * Checks if file exists
      * 
      * @return bool
@@ -41,21 +56,6 @@ class File
             throw new JsonException("Value cannot be decoded: ".$this->path);
         }
         return $json;
-    }
-    
-    /**
-     * Writes file to disk
-     * 
-     * @param mixed $value Value to save as JSON
-     * @throws JsonException If value could not be encoded
-     */
-    public function write($value): void
-    {
-        $val = json_encode($value);
-        if ($val === false) {
-            throw new JsonException("Value cannot be encoded!");
-        }
-        file_put_contents($this->path, $val);
     }
     
     /**
