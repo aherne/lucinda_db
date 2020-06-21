@@ -8,10 +8,7 @@ use Lucinda\DB\FileDeleter;
  */
 class ByCapacity implements FileDeleter
 {
-    private $minCapacity;
-    private $maxCapacity;
-    private $elements = [];
-    private $deleteCount = 0;
+    private $capacityHeap;
     
     /**
      * Constructs by user-specified maximum database entry capacity
@@ -21,8 +18,7 @@ class ByCapacity implements FileDeleter
      */
     public function __construct(int $minCapacity, int $maxCapacity)
     {
-        $this->minCapacity = $minCapacity;
-        $this->maxCapacity = $maxCapacity;
+        $this->capacityHeap = new CapacityHeap($minCapacity, $maxCapacity);
     }
     
     /**
@@ -32,37 +28,18 @@ class ByCapacity implements FileDeleter
     public function delete(string $folder, string $file): bool
     {
         if (strpos($file, ".json")!==false) {
-            $this->elements[$folder."/".$file] = filemtime($folder."/".$file);
+            $this->capacityHeap->push($folder."/".$file);
         }
         return false;
     }
     
     /**
-     * Sorts all entries in database by last modified time and deletes all past capacity
+     * Gets total of elements deleted
      *
      * @return int Number of elements deleted
      */
-    public function commit(): int
+    public function getTotal(): int
     {
-        $elementsCount = sizeof($this->elements);
-        if ($elementsCount >= $this->maxCapacity) {
-            asort($this->elements);
-            
-            // start deleting once capacity is reached
-            $i = 0;
-            $elementsToDelete = ($elementsCount-$this->minCapacity);
-            foreach ($this->elements as $path=>$lastModifiedTime) {
-                if ($i < $elementsToDelete) {
-                    unlink($path);
-                    unset($this->elements[$path]);
-                } else {
-                    break;
-                }
-                $i++;
-            }
-            return $elementsToDelete;
-        } else {
-            return 0;
-        }
+        return $this->capacityHeap->getTotalDeleted();
     }
 }

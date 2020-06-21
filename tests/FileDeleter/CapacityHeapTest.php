@@ -1,14 +1,15 @@
 <?php
 namespace Test\Lucinda\DB\FileDeleter;
     
-use Lucinda\DB\FileDeleter\ByCapacity;
 use Lucinda\DB\DatabaseEntry;
+use Lucinda\DB\FileDeleter\CapacityHeap;
 use Lucinda\UnitTest\Result;
 
-class ByCapacityTest
+class CapacityHeapTest
 {
     private $object;
-    private $schema;
+    
+    
     
     public function __construct()
     {
@@ -24,22 +25,24 @@ class ByCapacityTest
             $object->set($info["value"]);
             touch($this->schema."/".implode("_", $info["tags"]).".json", strtotime($info["date"]));
         }
-        $this->object = new ByCapacity(2, 3);
+        $this->object = new CapacityHeap(2, 3);
         
     }
+    
 
-    public function delete()
+    public function push()
     {
-        $this->object->delete($this->schema, "a_b.json");
-        $this->object->delete($this->schema, "b_c.json");
-        $this->object->delete($this->schema, "c_d.json");
-        $this->object->delete($this->schema, "d_e.json");
+        $this->object->push($this->schema."/a_b.json");
+        $this->object->push($this->schema."/b_c.json");
+        $this->object->push($this->schema."/c_d.json");
+        $this->object->push($this->schema."/d_e.json");
         return new Result(true);
-    }        
+    }
+        
 
-    public function getTotal()
+    public function getTotalDeleted()
     {
-        return new Result($this->object->getTotal()==2);
+        return new Result($this->object->getTotalDeleted()==2);
     }
         
 

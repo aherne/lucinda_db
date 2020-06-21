@@ -102,7 +102,7 @@ class DatabaseSchemaTest
             $object->set($info["value"]);
             touch($this->schema."/".implode("_", $info["tags"]).".json", strtotime($info["date"]));
         }
-        return new Result($this->object->deleteByCapacity(4, 8)==6);
+        return new Result($this->object->deleteByCapacity(4, 8)==4);
     }
         
 

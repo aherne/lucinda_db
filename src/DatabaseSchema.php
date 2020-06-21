@@ -95,8 +95,6 @@ class DatabaseSchema
     /**
      * Deletes entries from schema exceeding maximum capacity based on last modified time. 
      * 
-     * NOT RECOMMENDED: because it needs to operate with arrays and thus it's prone to memory limit errors
-     * 
      * @param int $minCapacity Number of entries allowed to remain if schema reaches max capacity
      * @param int $maxCapacity Maximum number of entries allowed to exist in schema
      * @return int Number of entries deleted
@@ -106,6 +104,6 @@ class DatabaseSchema
         $fileDeleter = new ByCapacity($minCapacity, $maxCapacity);
         $folder = new Folder($this->path);
         $folder->clear($fileDeleter);
-        return $fileDeleter->commit();
+        return $fileDeleter->getTotal();
     }
 }

@@ -1,11 +1,12 @@
 {
     "name": "lucinda/db",
     "type": "library",
-    "description": "Tag-based key-value store using files instead of RAM to store values",
+    "description": "Lucinda DB: Pure PHP Tag-Based Key-Value Store",
     "keywords": ["nosql","database","key-value store"],
     "license": "MIT",
     "require": {
-        "php": "^7.1"
+        "php": "^7.1",
+        "ext-spl": "*"
     },
     "require-dev": {
     	"lucinda/unit-testing": "^1.0"
