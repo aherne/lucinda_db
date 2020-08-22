@@ -1,8 +1,34 @@
 # Lucinda DB: Pure PHP Tag-Based Key-Value Store
  
-One of greatest inconveniences in key-value stores (eg: Redis) is simply that they are not relational. To search for ONE key, you will need to know its FULL name then everything is fine. What happens if you only know A PART of that key or want to search for MORE THAN ONE keys at once matching pattern? Key-value stores do not have a general answer for this problem, since that is not what they were designed for. They all work as RAM-based hash tables insuring very fast O(1*) complexity for inserting or deleting a key plus an ability (in most vendors) of periodically persisting entries on disk to restore in case server gets restarted. Partial searches will typically result into extremely slow O(N) operations that require traversal of entire hash table.
+Lucinda DB is a KEY-VALUE store originally designed to help developers cache results of resource-intensive SQL queries based to criteria (TAG) query depends on. It is different from other KV stores by having KEYs self-generate based on TAGs query result depended on and VALUEs saved as individual JSON files (instead of RAM) named by KEY in one/more SCHEMAs.
 
-This API follows a completely different approach! It thinks of a key as an intersection of edges in a directed multidimensional graph, each vertex coresponding to a criteria (aka TAG) based on whom key was calculated. VALUE of KEY, whose name corresponds to list of TAGs it depends on, will be stored as an individual json file inside a SCHEMA folder. This allows not only O(1) insertion/deletion (because OS knows where to look for already), but also fast searches of values in store by tag names through graph traversal algorithms.
+This approach brings following advantages: 
+
+- **ability to work without a server**: a database specification that can be implemented in any programming language on any operating system
+- *KEY standardization*: value of a KEY is generated according to a predictable rule based on value of TAGs it depends on
+- *no entries duplication*: because combination of TAGs is always unique, 
+- *ability to query by criteria*: something impossible in standard KV stores that purely rely on RAM hash tables
+- *portability*: to transfer/backup database, it is as easy as copying schema folder(s)
+- *scalability*: ability of database to be distributed on multiple disks in real time
+
+and following disadvantages:
+
+- *slightly reduced speed*: hard drives will always be slower than RAM, but considering how fast SSDs are this won't be a problem 
+- *no expiration for entries": all entries inside, being separate files, persist forever unless specifically deleted
+- *not suitable for temporary/volatile data": if your app expects database entries to be volatile (changing randomly), use standard KV stores instead
+- *requires daemonized maintenance*: in case volatility is expected, a program must periodically remove old files in order prevent disk(s) getting full
+
+Ultimately, it is always up for developers to decide which KV store model fits their application the best! More often than not you will need to employ multiple stores (eg: LucindaDB and Redis) to cover all usage case (one for persistent queryable data, the other for volatile data).
+
+
+## Key Concepts
+
+As stated in introduction text, Lucinda DB relies on following concepts:
+
+- TAGs: each tag being the criteria based on whom key name was generated
+- KEYs: a combination of TAGs
+- VALUEs:
+- SCHEMAs:
 
 ## Tags
 
