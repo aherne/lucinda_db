@@ -14,8 +14,8 @@ This approach brings following advantages:
 and following disadvantages:
 
 - *slightly reduced speed*: hard drives will always be slower than RAM, but considering how fast SSDs are this won't be a problem 
-- *no expiration for entries": all entries inside, being separate files, persist forever unless specifically deleted
-- *not suitable for temporary/volatile data": if your app expects database entries to be volatile (changing randomly), use standard KV stores instead
+- *no expiration for entries*: all entries inside, being separate files, persist forever unless specifically deleted
+- *not suitable for temporary/volatile data*: if your app expects database entries to be volatile (changing randomly), use standard KV stores instead
 - *requires daemonized maintenance*: in case volatility is expected, a program must periodically remove old files in order prevent disk(s) getting full
 
 Ultimately, it is always up for developers to decide which KV store model fits their application the best! More often than not you will need to employ multiple stores (eg: LucindaDB and Redis) to cover all usage case (one for persistent queryable data, the other for volatile data).
