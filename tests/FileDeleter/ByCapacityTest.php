@@ -2,7 +2,8 @@
 namespace Test\Lucinda\DB\FileDeleter;
     
 use Lucinda\DB\FileDeleter\ByCapacity;
-use Lucinda\DB\DatabaseEntry;
+use Lucinda\DB\Key;
+use Lucinda\DB\Value;
 use Lucinda\UnitTest\Result;
 
 class ByCapacityTest
@@ -20,7 +21,8 @@ class ByCapacityTest
             ["tags"=>["d", "e"], "value"=>4, "date"=>"2018-04-05 10:11:12"]
         ];
         foreach ($entries as $info) {
-            $object = new DatabaseEntry($this->schema, $info["tags"]);
+            $key = new Key($info["tags"]);
+            $object = new Value($this->schema, $key->getValue());
             $object->set($info["value"]);
             touch($this->schema."/".implode("_", $info["tags"]).".json", strtotime($info["date"]));
         }

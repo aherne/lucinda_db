@@ -2,7 +2,7 @@
 namespace Lucinda\DB;
 
 /**
- * Exception thrown when an entry operation required key to exist already was executed and key was not found in DB
+ * Exception thrown when a value operation required key to exist already
  */
 class KeyNotFoundException extends \Exception
 {

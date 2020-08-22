@@ -5,28 +5,23 @@ use Lucinda\DB\FileUpdater\Increment;
 use Lucinda\DB\FileUpdater\Decrement;
 
 /**
- * Encapsulates operations on an entry in LucindaDB
+ * Encapsulates value in KV store based on schema and key
  */
-class DatabaseEntry
+class Value
 {
-    private $keysFolder;
+    private $schema;
     private $key;
     
     /**
      * Constructs entry based on schema folder and tags it depends on
      * 
      * @param string $schema Folder holding entries
-     * @param array $tags List of tags entry depends on.
-     * @throws KeyException If tags contain non-alphanumeric characters
+     * @param string $key Value of entry key
      */
-    public function __construct(string $schema, array $tags)
+    public function __construct(string $schema, string $key)
     {
-        // saves folder
-        $this->keysFolder = $schema;
-                
-        // builds key
-        $object = new Key($tags);
-        $this->key = $object->getValue();
+        $this->schema = $schema;
+        $this->key = $key;
     }
     
     /**
@@ -36,7 +31,7 @@ class DatabaseEntry
      */
     public function set($value): void
     {
-        $file1 = new File($this->keysFolder."/".$this->key.".json");
+        $file1 = new File($this->schema."/".$this->key.".json");
         $file1->write($value);
     }
     
@@ -48,7 +43,7 @@ class DatabaseEntry
      */
     public function get()
     {
-        $file = new File($this->keysFolder."/".$this->key.".json");
+        $file = new File($this->schema."/".$this->key.".json");
         if (!$file->exists()) {
             throw new KeyNotFoundException($this->key);
         }
@@ -62,7 +57,7 @@ class DatabaseEntry
      */
     public function exists(): bool
     {
-        $file = new File($this->keysFolder."/".$this->key.".json");
+        $file = new File($this->schema."/".$this->key.".json");
         return $file->exists();
     }
     
@@ -74,12 +69,12 @@ class DatabaseEntry
      */
     public function increment(): int
     {
-        $file = new File($this->keysFolder."/".$this->key.".json");
+        $file = new File($this->schema."/".$this->key.".json");
         if (!$file->exists()) {
             throw new KeyNotFoundException($this->key);
         }
         
-        $fileUpdater = new Increment($this->keysFolder."/".$this->key.".json");
+        $fileUpdater = new Increment($this->schema."/".$this->key.".json");
         $file->update($fileUpdater);
         
         return $fileUpdater->getValue();
@@ -93,12 +88,12 @@ class DatabaseEntry
      */
     public function decrement(): int
     {
-        $file = new File($this->keysFolder."/".$this->key.".json");
+        $file = new File($this->schema."/".$this->key.".json");
         if (!$file->exists()) {
             throw new KeyNotFoundException($this->key);
         }
         
-        $fileUpdater = new Decrement($this->keysFolder."/".$this->key.".json");
+        $fileUpdater = new Decrement($this->schema."/".$this->key.".json");
         $file->update($fileUpdater);
         
         return $fileUpdater->getValue();
@@ -111,7 +106,7 @@ class DatabaseEntry
      */
     public function delete(): void
     {
-        $file = new File($this->keysFolder."/".$this->key.".json");
+        $file = new File($this->schema."/".$this->key.".json");
         if (!$file->exists()) {
             throw new KeyNotFoundException($this->key);
         }

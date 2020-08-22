@@ -1,11 +1,12 @@
 <?php
 namespace Test\Lucinda\DB;
     
-use Lucinda\DB\DatabaseSchema;
+use Lucinda\DB\Schema;
 use Lucinda\UnitTest\Result;
-use Lucinda\DB\DatabaseEntry;
+use Lucinda\DB\Value;
+use Lucinda\DB\Key;
 
-class DatabaseSchemaTest
+class SchemaTest
 {
     private $schema;
     private $object;
@@ -23,7 +24,7 @@ class DatabaseSchemaTest
             rmdir($this->schema);
         }
         
-        $this->object = new DatabaseSchema($this->schema);
+        $this->object = new Schema($this->schema);
     }
     
     
@@ -46,7 +47,8 @@ class DatabaseSchemaTest
             ["tags"=>["c", "d"], "value"=>3]
         ];
         foreach ($entries as $info) {
-            $object = new DatabaseEntry($this->schema, $info["tags"]);
+            $key = new Key($info["tags"]);
+            $object = new Value($this->schema, $key->getValue());
             $object->set($info["value"]);
         }
         return new Result($this->object->getCurrentCapacity()==3);
@@ -68,7 +70,8 @@ class DatabaseSchemaTest
             ["tags"=>["d", "e"], "value"=>3, "date"=>"2018-04-05 10:11:12"]
         ];
         foreach ($entries as $info) {
-            $object = new DatabaseEntry($this->schema, $info["tags"]);
+            $key = new Key($info["tags"]);
+            $object = new Value($this->schema, $key->getValue());
             $object->set($info["value"]);
             touch($this->schema."/".implode("_", $info["tags"]).".json", strtotime($info["date"]));
         }
@@ -98,7 +101,8 @@ class DatabaseSchemaTest
             ["tags"=>["j", "k"], "value"=>10, "date"=>"2018-10-05 10:11:12"]
         ];
         foreach ($entries as $info) {
-            $object = new DatabaseEntry($this->schema, $info["tags"]);
+            $key = new Key($info["tags"]);
+            $object = new Value($this->schema, $key->getValue());
             $object->set($info["value"]);
             touch($this->schema."/".implode("_", $info["tags"]).".json", strtotime($info["date"]));
         }

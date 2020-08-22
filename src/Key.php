@@ -2,7 +2,7 @@
 namespace Lucinda\DB;
 
 /**
- * Encapsulates key creation based on composing tags 
+ * Encapsulates key in KV store based on composing tags 
  */
 class Key
 {

@@ -1,9 +1,10 @@
 <?php
 namespace Test\Lucinda\DB\FileDeleter;
     
-use Lucinda\DB\DatabaseEntry;
+use Lucinda\DB\Value;
 use Lucinda\DB\FileDeleter\ByTag;
 use Lucinda\UnitTest\Result;
+use Lucinda\DB\Key;
 
 class ByTagTest
 {
@@ -15,7 +16,8 @@ class ByTagTest
             ["tags"=>["a", "b"], "value"=>1, "date"=>"2018-01-02 01:02:03"]
         ];
         foreach ($entries as $info) {
-            $object = new DatabaseEntry($schema, $info["tags"]);
+            $key = new Key($info["tags"]);
+            $object = new Value($schema, $key->getValue());
             $object->set($info["value"]);
             touch($schema."/".implode("_", $info["tags"]).".json", strtotime($info["date"]));
         }

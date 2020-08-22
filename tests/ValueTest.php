@@ -1,10 +1,11 @@
 <?php
 namespace Test\Lucinda\DB;
     
-use Lucinda\DB\DatabaseEntry;
+use Lucinda\DB\Value;
 use Lucinda\UnitTest\Result;
+use Lucinda\DB\Key;
 
-class DatabaseEntryTest
+class ValueTest
 {
     private $object;
     
@@ -22,7 +23,8 @@ class DatabaseEntryTest
             }
         }
         
-        $this->object = new DatabaseEntry($schema, ["a","b"]);
+        $key =  new Key(["a","b"]);
+        $this->object = new Value($schema, $key->getValue());
     }
 
     public function set()

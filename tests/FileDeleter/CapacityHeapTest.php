@@ -1,9 +1,10 @@
 <?php
 namespace Test\Lucinda\DB\FileDeleter;
     
-use Lucinda\DB\DatabaseEntry;
+use Lucinda\DB\Value;
 use Lucinda\DB\FileDeleter\CapacityHeap;
 use Lucinda\UnitTest\Result;
+use Lucinda\DB\Key;
 
 class CapacityHeapTest
 {
@@ -21,7 +22,8 @@ class CapacityHeapTest
             ["tags"=>["d", "e"], "value"=>4, "date"=>"2018-04-05 10:11:12"]
         ];
         foreach ($entries as $info) {
-            $object = new DatabaseEntry($this->schema, $info["tags"]);
+            $key = new Key($info["tags"]);
+            $object = new Value($this->schema, $key->getValue());
             $object->set($info["value"]);
             touch($this->schema."/".implode("_", $info["tags"]).".json", strtotime($info["date"]));
         }

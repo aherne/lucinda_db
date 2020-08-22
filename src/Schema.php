@@ -10,7 +10,7 @@ use Lucinda\DB\FileDeleter\ByCapacity;
 /**
  * Encapsulates operations on a LucindaDB folder schema [4,294,967,295]
  */
-class DatabaseSchema
+class Schema
 {
     private $path;
     
