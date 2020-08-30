@@ -111,7 +111,7 @@ $value = new Lucinda\DB\Value("/usr/local/share/db", $key->getValue()); // insta
 $value->set($data); // saves DATA by KEY, creating a KEY.json file within SCHEMA
 ```
 
-A complicated problem in all databases is concurrency management. What happens when a increment or decrement operation is ran at same time by different app users? If concurrency isn't managed, only one will increment so the end result will be inconsistent. To address this issue, MUTEX locks are used: if a lock is acquired by an user on that KEY, the other will wait until former completes. If, however, on second attempt lock is still not released by previous process an exception is thrown!
+A complicated problem in all databases is concurrency management. What happens when a increment or decrement operation is ran at same time by different app users (race condition)? If concurrency isn't managed, only one will increment so the end result will be inconsistent. To address this issue, MUTEX locks are used: if a lock is acquired by an user on that KEY, the other will wait until former completes. If, however, on second attempt lock is still not released by previous process an exception is thrown!
 
 ### Schema
  

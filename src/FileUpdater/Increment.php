@@ -9,16 +9,19 @@ use Lucinda\DB\FileUpdater;
 class Increment implements FileUpdater
 {
     private $key;
+    private $step;
     private $value;
     
     /**
      * Constructs by entry key
      *
      * @param string $key Key of entry in database
+     * @param int $step Step of incrementation
      */
-    public function __construct(string $key)
+    public function __construct(string $key, int $step = 1)
     {
         $this->key = $key;
+        $this->step = $step;
     }
     
     /**
@@ -27,7 +30,7 @@ class Increment implements FileUpdater
      */
     public function update(&$json): bool
     {
-        $json++;
+        $json += $this->step;
         $this->value = $json;
         return true;
     }

@@ -64,17 +64,18 @@ class Value
     /**
      * Increments existing entry and returns value
      *
+     * @param int $step Step of incrementation
      * @throws KeyNotFoundException If entry doesn't exist
      * @return int
      */
-    public function increment(): int
+    public function increment(int $step = 1): int
     {
         $file = new File($this->schema."/".$this->key.".json");
         if (!$file->exists()) {
             throw new KeyNotFoundException($this->key);
         }
         
-        $fileUpdater = new Increment($this->schema."/".$this->key.".json");
+        $fileUpdater = new Increment($this->schema."/".$this->key.".json", $step);
         $file->update($fileUpdater);
         
         return $fileUpdater->getValue();
@@ -83,17 +84,18 @@ class Value
     /**
      * Decrements existing entry and returns value
      *
+     * @param int $step Step of decrementation
      * @throws KeyNotFoundException If entry doesn't exist
      * @return int
      */
-    public function decrement(): int
+    public function decrement(int $step = 1): int
     {
         $file = new File($this->schema."/".$this->key.".json");
         if (!$file->exists()) {
             throw new KeyNotFoundException($this->key);
         }
         
-        $fileUpdater = new Decrement($this->schema."/".$this->key.".json");
+        $fileUpdater = new Decrement($this->schema."/".$this->key.".json", $step);
         $file->update($fileUpdater);
         
         return $fileUpdater->getValue();
