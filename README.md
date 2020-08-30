@@ -21,7 +21,7 @@ and following disadvantages:
 
 Ultimately, it is always up for developers to decide which KV store model fits their application the best! More often than not you will need to employ multiple stores (eg: LucindaDB and Redis) to cover all usage cases (one for persistent queryable data, the other for volatile data).
 
-## Key Concepts
+## Fundamental Concepts
 
 As stated in introduction text, in order to understand how Lucinda DB works, following concepts must be made clear:
 
@@ -66,7 +66,7 @@ A key is unique identifier of DATA in KV store named by combination of TAGs data
 - sorts TAGs alphabetically
 - joins all TAGS using "_" sign
 
-Key creation is encapsulated by Lucinda\DB\Key class. Usage example:
+Key creation is encapsulated by **[Lucinda\DB\Key](https://github.com/aherne/lucinda_db/blob/master/src/Key.php)** class. Usage example:
 
 ```php
 $object = new Lucinda\DB\Key(["users", "roles"]);
@@ -84,7 +84,9 @@ WHERE t1.id = 12
 ```
 
 Processed into PHP array:
+```php
 ["(role"), "(role)"]
+```
 
 Even though query also  only involved users and roles, its semantic was different and so was processing. In that case, users must add an extra *specializer* tag (eg: MD5 checksum of that query) when creating key:
 
@@ -101,7 +103,7 @@ A value is a JSON-ed representation of DATA saved on disk saved as a .json file 
 - VALUE is compiled by JSON encoding DATA. This naturally means data you're attempting to save must be json encodable, otherwise an exception is going to be thrown.
 - VALUE is saved as a file named by KEY within SCHEMA folder whose name is KEY and extension is ".json"
 
-Value operations are encapsulated by Lucinda\DB\Value class. Usage example:
+Value operations are encapsulated by **[Lucinda\DB\Value](https://github.com/aherne/lucinda_db/blob/master/src/Value.php)** class. Usage example:
 
 ```php
 $key = new Lucinda\DB\Key(["users", "roles"]); // initializes KEY
@@ -131,8 +133,4 @@ $schema = new Lucinda\DB\Schema("/usr/local/share/db"); // instances VALUE
 $schema->deleteUntil(time()-(3600*24)); // deletes all files older than one day ago
 ```
 
-In addition to deletion algorithms, Lucinda\DB\Schema allows you to fast find files, but indexing is recommended
-
-### Indexing
-
-Some
+In addition to deletion algorithms, **[Lucinda\DB\Schema](https://github.com/aherne/lucinda_db/blob/master/src/Schema.php)** allows you to fast find files, but indexing is recommended
