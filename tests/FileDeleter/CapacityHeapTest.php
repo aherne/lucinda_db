@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\DB\FileDeleter;
-    
+
 use Lucinda\DB\Value;
 use Lucinda\DB\FileDeleter\CapacityHeap;
 use Lucinda\UnitTest\Result;
@@ -28,7 +28,6 @@ class CapacityHeapTest
             touch($this->schema."/".implode("_", $info["tags"]).".json", strtotime($info["date"]));
         }
         $this->object = new CapacityHeap(2, 3);
-        
     }
     
 
@@ -46,6 +45,4 @@ class CapacityHeapTest
     {
         return new Result($this->object->getTotalDeleted()==2);
     }
-        
-
 }

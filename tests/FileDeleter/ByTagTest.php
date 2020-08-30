@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\DB\FileDeleter;
-    
+
 use Lucinda\DB\Value;
 use Lucinda\DB\FileDeleter\ByTag;
 use Lucinda\UnitTest\Result;
@@ -8,7 +8,6 @@ use Lucinda\DB\Key;
 
 class ByTagTest
 {
-
     public function delete()
     {
         $schema = dirname(__DIR__)."/DB";
@@ -24,6 +23,4 @@ class ByTagTest
         $object = new ByTag("a");
         return new Result($object->delete($schema, "a_b.json"));
     }
-        
-
 }

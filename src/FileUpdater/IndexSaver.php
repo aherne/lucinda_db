@@ -8,17 +8,19 @@ use Lucinda\DB\FileUpdater;
  */
 class IndexSaver implements FileUpdater
 {
+    private $schema;
     private $key;
-    private $value;
     
     /**
      * Constructs by entry key
      *
+     * @param string $schema Folder where entry is saved
      * @param string $key Key of entry in database
      */
-    public function __construct(string $key)
+    public function __construct(string $schema, string $key)
     {
         $this->key = $key;
+        $this->schema = $schema;
     }
     
     /**
@@ -27,7 +29,7 @@ class IndexSaver implements FileUpdater
      */
     public function update(&$json): bool
     {
-        $json[$this->key] = $this->key;
+        $json[$this->key] = $this->schema;
         return true;
     }
 }

@@ -2,7 +2,7 @@
 namespace Lucinda\DB;
 
 /**
- * Encapsulates key in KV store based on composing tags 
+ * Encapsulates key in KV store based on composing tags
  */
 class Key
 {
@@ -10,7 +10,7 @@ class Key
     
     /**
      * Constructs key based on composing tags
-     * 
+     *
      * @param array $tags List of tags key is composed of
      */
     public function __construct(array $tags)
@@ -20,32 +20,32 @@ class Key
     
     /**
      * Creates key name based on composing tags
-     * 
+     *
      * @param array $tags List of tags key is composed of
      * @throws KeyException If one of tags is not alphanumeric
      */
     private function setValue(array $tags): void
     {
-        if(empty($tags)) {
+        if (empty($tags)) {
             throw new KeyException("Tags cannot be empty!");
         }
         // validate
-        $tags = array_map(function($value) {
-            if (!is_string($value) || preg_match("/^[a-zA-Z0-9\-]+$/", $value)==0) {
-                throw new KeyException("Tags can only be alphanumeric!");
+        $tags = array_map(function ($value) {
+            if (preg_match("/^[a-z0-9\-]+$/", $value)==0) {
+                throw new KeyException("Tags can contain only lowercase alphanumeric characters!");
             }
-            return strtolower($value);
+            return $value;
         }, $tags);
         // sort, if number of elements is more than one
-        if(count($tags)>1) {
+        if (count($tags)>1) {
             sort($tags);
         }
         $this->value = implode("_", $tags);
     }
     
     /**
-     * Gets key name created 
-     * 
+     * Gets key name created
+     *
      * @return string
      */
     public function getValue(): string

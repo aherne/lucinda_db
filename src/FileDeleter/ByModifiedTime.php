@@ -12,7 +12,7 @@ class ByModifiedTime implements FileDeleter
     
     /**
      * Constructs by user-specified minimum last modified time
-     * 
+     *
      * @param int $modifiedTime
      */
     public function __construct(int $modifiedTime)

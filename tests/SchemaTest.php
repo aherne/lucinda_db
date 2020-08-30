@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\DB;
-    
+
 use Lucinda\DB\Schema;
 use Lucinda\UnitTest\Result;
 use Lucinda\DB\Value;
@@ -14,7 +14,7 @@ class SchemaTest
     public function __construct()
     {
         $this->schema = __DIR__."/DB";
-        if(is_dir($this->schema)) {
+        if (is_dir($this->schema)) {
             $files = scandir($this->schema);
             foreach ($files as $file) {
                 if (!in_array($file, [".",".."])) {
@@ -39,7 +39,7 @@ class SchemaTest
     }
         
 
-    public function getCurrentCapacity()
+    public function getCapacity()
     {
         $entries = [
             ["tags"=>["a", "b"], "value"=>1],
@@ -51,7 +51,19 @@ class SchemaTest
             $object = new Value($this->schema, $key->getValue());
             $object->set($info["value"]);
         }
-        return new Result($this->object->getCurrentCapacity()==3);
+        return new Result($this->object->getCapacity()==3);
+    }
+    
+    
+    public function getAll()
+    {
+        return new Result($this->object->getAll()==["a_b", "b_c", "c_d"]);
+    }
+    
+    
+    public function getByTag()
+    {
+        return new Result($this->object->getByTag("b")==["a_b", "b_c"]);
     }
         
 
@@ -108,6 +120,4 @@ class SchemaTest
         }
         return new Result($this->object->deleteByCapacity(4, 8)==4);
     }
-        
-
 }

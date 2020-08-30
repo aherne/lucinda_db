@@ -12,7 +12,7 @@ class ByTag implements FileDeleter
     
     /**
      * Constructs by tag to match
-     * 
+     *
      * @param string $tag Name of tag to match
      */
     public function __construct(string $tag)

@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\DB\FileDeleter;
-    
+
 use Lucinda\DB\FileDeleter\ByModifiedTime;
 use Lucinda\DB\Key;
 use Lucinda\DB\Value;
@@ -8,7 +8,6 @@ use Lucinda\UnitTest\Result;
 
 class ByModifiedTimeTest
 {
-
     public function delete()
     {
         $schema = dirname(__DIR__)."/DB";
@@ -24,6 +23,4 @@ class ByModifiedTimeTest
         $object = new ByModifiedTime(strtotime("2018-01-23 10:11:22"));
         return new Result($object->delete($schema, "a_b.json"));
     }
-        
-
 }

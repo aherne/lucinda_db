@@ -8,10 +8,10 @@ interface FileDeleter
 {
     /**
      * Attempts to perform file deletion, if applicable.
-     * 
+     *
      * @param string $folder Schema folder containing file to delete
      * @param string $file File to delete
      * @return bool Whether or not delete was performed
      */
-    function delete(string $folder, string $file): bool;
+    public function delete(string $folder, string $file): bool;
 }

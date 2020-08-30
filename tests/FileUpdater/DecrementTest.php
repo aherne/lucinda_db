@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\DB\FileUpdater;
-    
+
 use Lucinda\DB\FileUpdater\Decrement;
 use Lucinda\UnitTest\Result;
 
@@ -24,6 +24,4 @@ class DecrementTest
     {
         return new Result($this->object->getValue()==1);
     }
-        
-
 }

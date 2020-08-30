@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\DB;
-    
+
 use Lucinda\DB\Folder;
 use Lucinda\UnitTest\Result;
 use Lucinda\DB\FileDeleter\All;
@@ -32,6 +32,15 @@ class FolderTest
     {
         return new Result($this->object->isWritable());
     }
+    
+    
+    public function scan()
+    {
+        file_put_contents($this->folder."/a.json", "x");
+        $scanner = new \Lucinda\DB\FileInspector\Counter();
+        $this->object->scan($scanner);
+        return new Result($scanner->getValue()==1);
+    }
         
 
     public function clear()
@@ -41,6 +50,4 @@ class FolderTest
         rmdir($this->folder);
         return $result;
     }
-        
-
 }

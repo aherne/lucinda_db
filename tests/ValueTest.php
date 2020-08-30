@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\DB;
-    
+
 use Lucinda\DB\Value;
 use Lucinda\UnitTest\Result;
 use Lucinda\DB\Key;
@@ -12,7 +12,7 @@ class ValueTest
     public function __construct()
     {
         $schema = __DIR__."/DB";
-        if(!is_dir($schema)) {
+        if (!is_dir($schema)) {
             mkdir($schema, 0777);
         } else {
             $files = scandir($schema);
@@ -63,6 +63,4 @@ class ValueTest
         $this->object->delete();
         return new Result(!$this->object->exists());
     }
-        
-
 }

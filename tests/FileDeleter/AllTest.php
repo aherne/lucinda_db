@@ -1,12 +1,11 @@
 <?php
 namespace Test\Lucinda\DB\FileDeleter;
-    
+
 use Lucinda\DB\FileDeleter\All;
 use Lucinda\UnitTest\Result;
 
 class AllTest
 {
-
     public function delete()
     {
         $schema = dirname(__DIR__)."/DB";
@@ -16,6 +15,4 @@ class AllTest
         $status = $object->delete($schema, $file);
         return new Result($status);
     }
-        
-
 }

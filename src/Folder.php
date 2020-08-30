@@ -10,8 +10,8 @@ class Folder
     
     /**
      * Constructs folder by absolute path
-     * 
-     * @param string $path 
+     *
+     * @param string $path
      */
     public function __construct(string $path)
     {
@@ -20,7 +20,7 @@ class Folder
     
     /**
      * Creates folder
-     * 
+     *
      * @param int $permissions Rights folder is
      * @return bool Whether or not folder was created
      */
@@ -31,7 +31,7 @@ class Folder
     
     /**
      * Checks if folder exists
-     * 
+     *
      * @return bool
      */
     public function exists(): bool
@@ -41,7 +41,7 @@ class Folder
     
     /**
      * Checks if folder is writable
-     * 
+     *
      * @return bool
      */
     public function isWritable(): bool
@@ -50,8 +50,22 @@ class Folder
     }
     
     /**
+     * Scans folder of files and applies inspection algorithm on each entry
+     *
+     * @param FileInspector $inspector
+     */
+    public function scan(FileInspector $inspector): void
+    {
+        $handle = opendir($this->path);
+        while (($file = readdir($handle)) !== false) {
+            $inspector->inspect($this->path, $file);
+        }
+        closedir($handle);
+    }
+    
+    /**
      * Clears folder of files matching callback and returns how many were deleted
-     * 
+     *
      * @param FileDeleter $deleter Encapsulates algorithm of file deletion
      * @return int Number of files deleted
      */
@@ -59,7 +73,7 @@ class Folder
     {
         $result = 0;
         $handle = opendir($this->path);
-        while (($file = readdir($handle)) !== false){
+        while (($file = readdir($handle)) !== false) {
             if ($deleter->delete($this->path, $file)) {
                 $result++;
             }
@@ -68,4 +82,3 @@ class Folder
         return $result;
     }
 }
-

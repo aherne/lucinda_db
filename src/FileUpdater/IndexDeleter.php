@@ -2,13 +2,13 @@
 namespace Lucinda\DB\FileUpdater;
 
 use Lucinda\DB\FileUpdater;
+
 /**
  * Encapsulates a deleter of an index entry
  */
 class IndexDeleter implements FileUpdater
 {
     private $key;
-    private $value;
     
     /**
      * Constructs by entry key

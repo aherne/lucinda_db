@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\DB;
-    
+
 use Lucinda\DB\File;
 use Lucinda\UnitTest\Result;
 use Lucinda\DB\FileUpdater;
@@ -54,6 +54,4 @@ class FileTest
         $this->object->delete();
         return new Result(!$this->object->exists());
     }
-        
-
 }

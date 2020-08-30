@@ -10,7 +10,7 @@ class File
     
     /**
      * Constructs file by absolute path.
-     * 
+     *
      * @param string $path Absolute path.
      */
     public function __construct(string $path)
@@ -35,7 +35,7 @@ class File
     
     /**
      * Checks if file exists
-     * 
+     *
      * @return bool
      */
     public function exists(): bool
@@ -45,7 +45,7 @@ class File
     
     /**
      * Reads file and returns value
-     * 
+     *
      * @throws JsonException If value could not be decoded
      * @return mixed
      */
@@ -60,9 +60,9 @@ class File
     
     /**
      * Updates value in file by callback using exclusive lock to insure writes synchronization
-     * 
+     *
      * WARNING: this operation is protected by a mutex, but in order to to prevent deadlocks it doesn't wait if mutex could not be acquired
-     * 
+     *
      * @param FileUpdater $callback Encapsulates algorithm of file value update
      * @throws JsonException If value could not be decoded
      * @throws LockException If mutex could not be acquired.
@@ -101,9 +101,8 @@ class File
     /**
      * Deletes file from disk
      */
-    public function delete() 
+    public function delete()
     {
         unlink($this->path);
     }
 }
-

@@ -13,7 +13,7 @@ class Decrement implements FileUpdater
     
     /**
      * Constructs by entry key
-     * 
+     *
      * @param string $key Key of entry in database
      */
     public function __construct(string $key)
@@ -34,7 +34,7 @@ class Decrement implements FileUpdater
     
     /**
      * Gets decremented value
-     * 
+     *
      * @return int
      */
     public function getValue(): int

@@ -6,5 +6,4 @@ namespace Lucinda\DB;
  */
 class KeyNotFoundException extends \Exception
 {
-    
 }

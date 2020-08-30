@@ -27,14 +27,14 @@ class CapacityHeap extends \SplMaxHeap
      * {@inheritDoc}
      * @see \SplMaxHeap::compare()
      */
-    protected function compare ($value1, $value2)
+    protected function compare($value1, $value2)
     {
         return $value2["date"]-$value1["date"];
     }
     
     /**
      * Push file to queue
-     * 
+     *
      * @param string $filePath Absolute file location on disk.
      */
     public function push($filePath)
@@ -64,7 +64,7 @@ class CapacityHeap extends \SplMaxHeap
     
     /**
      * Gets total number of files deleted
-     * 
+     *
      * @return number
      */
     public function getTotalDeleted()

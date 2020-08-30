@@ -24,6 +24,22 @@ class Index
         $this->schema = $schema;
         $this->tag = $tag;
     }
+    
+    /**
+     * Adds key to index
+     *
+     * @param string $schema
+     * @param string $key
+     */
+    public function add(string $schema, string $key): void
+    {
+        $file = new File($this->schema."/".$this->tag.".json");
+        if (!$file->exists()) {
+            $file->write([$key=>$schema]);
+        } else {
+            $file->update(new IndexSaver($schema, $key));
+        }
+    }
         
     /**
      * Checks if index exists
@@ -37,37 +53,8 @@ class Index
     }
     
     /**
-     * Adds key to index
-     * 
-     * @param string $key
-     */
-    public function add(string $key): void
-    {
-        $file = new File($this->schema."/".$this->tag.".json");
-        if (!$file->exists()) {
-            $file->write([$this->tag=>$this->tag]);
-        } else {
-            $file->update(new IndexSaver($key));
-        }
-    }
-    
-    /**
-     * Removes key from index
-     * 
-     * @param string $key
-     */
-    public function remove(string $key): void
-    {
-        $file = new File($this->schema."/".$this->tag.".json");
-        if (!$file->exists()) {
-            throw new IndexNotFoundException($this->tag);
-        }
-        $file->update(new IndexDeleter($key));
-    }
-    
-    /**
      * Gets all keys in index
-     * 
+     *
      * @throws IndexNotFoundException
      * @return array
      */
@@ -78,6 +65,20 @@ class Index
             throw new IndexNotFoundException($this->tag);
         }
         return $file->read();
+    }
+    
+    /**
+     * Removes key from index
+     *
+     * @param string $key
+     */
+    public function remove(string $key): void
+    {
+        $file = new File($this->schema."/".$this->tag.".json");
+        if (!$file->exists()) {
+            throw new IndexNotFoundException($this->tag);
+        }
+        $file->update(new IndexDeleter($key));
     }
     
     /**
@@ -94,4 +95,3 @@ class Index
         $file->delete();
     }
 }
-

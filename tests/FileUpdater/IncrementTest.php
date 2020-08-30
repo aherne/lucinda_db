@@ -24,6 +24,4 @@ class IncrementTest
     {
         return new Result($this->object->getValue()==2);
     }
-    
-    
 }

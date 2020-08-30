@@ -14,7 +14,7 @@ class Value
     
     /**
      * Constructs entry based on schema folder and tags it depends on
-     * 
+     *
      * @param string $schema Folder holding entries
      * @param string $key Value of entry key
      */
@@ -26,7 +26,7 @@ class Value
     
     /**
      * Sets entry value
-     * 
+     *
      * @param mixed $value
      */
     public function set($value): void
@@ -37,7 +37,7 @@ class Value
     
     /**
      * Gets existing entry value
-     * 
+     *
      * @throws KeyNotFoundException If entry doesn't exist
      * @return mixed
      */
@@ -52,7 +52,7 @@ class Value
     
     /**
      * Checks if entry exists
-     * 
+     *
      * @return bool
      */
     public function exists(): bool
@@ -63,7 +63,7 @@ class Value
     
     /**
      * Increments existing entry and returns value
-     * 
+     *
      * @throws KeyNotFoundException If entry doesn't exist
      * @return int
      */
@@ -101,7 +101,7 @@ class Value
     
     /**
      * Deletes existing entry
-     * 
+     *
      * @throws KeyNotFoundException If entry doesn't exist
      */
     public function delete(): void
