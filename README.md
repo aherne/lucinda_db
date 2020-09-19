@@ -4,7 +4,7 @@ Lucinda DB is serverless KEY-VALUE store originally designed to help developers 
 
 This approach brings following advantages: 
 
-- **ability or working without a server**: operating system on client machine, already optimized to manipulate files, becomes the server
+- **ability of working without a server**: operating system on host machine, already optimized to manipulate files, becomes the server
 - **ability of being platform agnostic**: a database specification that can be implemented in any programming language on any operating system
 - *KEY standardization*: value of a KEY is generated according to a predictable rule based on value of TAGs it depends on
 - *no entries duplication*: because combination of TAGs is always unique, 
