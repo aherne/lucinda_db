@@ -13,12 +13,13 @@ class ByCapacity implements FileDeleter
     /**
      * Constructs by user-specified maximum database entry capacity
      *
+     * @param array $replicas Replicas on whom database is distributed
      * @param int $minCapacity Number of entries allowed to remain if database reached max capacity.
      * @param int $maxCapacity Maximum number of entries allowed to exist in database.
      */
-    public function __construct(int $minCapacity, int $maxCapacity)
+    public function __construct(array $replicas, int $minCapacity, int $maxCapacity)
     {
-        $this->capacityHeap = new CapacityHeap($minCapacity, $maxCapacity);
+        $this->capacityHeap = new CapacityHeap($replicas, $minCapacity, $maxCapacity);
     }
     
     /**
@@ -27,8 +28,8 @@ class ByCapacity implements FileDeleter
      */
     public function delete(string $folder, string $file): bool
     {
-        if (strpos($file, ".json")!==false) {
-            $this->capacityHeap->push($folder."/".$file);
+        if (!in_array($file, [".", ".."])) {
+            $this->capacityHeap->push($file);
         }
         return false;
     }

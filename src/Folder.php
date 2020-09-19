@@ -81,4 +81,12 @@ class Folder
         closedir($handle);
         return $result;
     }
+    
+    /**
+     * Deletes folder from disk
+     */
+    public function delete()
+    {
+        rmdir($this->path);
+    }
 }

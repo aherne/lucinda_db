@@ -2,7 +2,7 @@
 namespace Test\Lucinda\DB;
 
 use Lucinda\DB\Wrapper;
-use Lucinda\DB\Driver;
+use Lucinda\DB\ValueDriver;
 use Lucinda\UnitTest\Result;
 
 class WrapperTest
@@ -21,6 +21,6 @@ class WrapperTest
     </ldb>
 </xml>
 '), "local");
-        return new Result($wrapper->getDriver(["a","b"]) instanceof Driver);
+        return new Result($wrapper->getEntryDriver(["a","b"]) instanceof ValueDriver);
     }
 }

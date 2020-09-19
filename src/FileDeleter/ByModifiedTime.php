@@ -9,15 +9,17 @@ use Lucinda\DB\FileDeleter;
 class ByModifiedTime implements FileDeleter
 {
     private $modifiedTime;
+    private $replicas = [];
     
     /**
      * Constructs by user-specified minimum last modified time
      *
      * @param int $modifiedTime
      */
-    public function __construct(int $modifiedTime)
+    public function __construct(int $modifiedTime, array $replicas)
     {
         $this->modifiedTime = $modifiedTime;
+        $this->replicas = $replicas;
     }
     
     /**
@@ -26,8 +28,10 @@ class ByModifiedTime implements FileDeleter
      */
     public function delete(string $folder, string $file): bool
     {
-        if (strpos($file, ".json")!==false && filemtime($folder."/".$file) < $this->modifiedTime) {
-            unlink($folder."/".$file);
+        if (!in_array($file, [".", ".."]) && filemtime($folder."/".$file) < $this->modifiedTime) {
+            foreach($this->replicas as $schema) {
+                unlink($schema."/".$file);
+            }
             return true;
         } else {
             return false;

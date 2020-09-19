@@ -6,71 +6,80 @@ namespace Lucinda\DB;
  */
 class Configuration
 {
-    private $masterSchema;
-    private $distributionType;
-    private $slaveSchemas = [];
+    private $xmlFilePath;
+    private $developmentEnvironment;
+    
+    private $schemas = [];
     
     /**
      * Reads XML file for schema and distribution policies.
      *
-     * @param \SimpleXMLElement $xml XML root where ldb tag must be a child
+     * @param string $xmlFilePath Path to XML configuration file
      * @param string $developmentEnvironment Value of development environment
      * @throws ConfigurationException If XML is improperly formatted
      */
-    public function __construct(\SimpleXMLElement $xml, string $developmentEnvironment)
+    public function __construct(string $xmlFilePath, string $developmentEnvironment)
     {
-        $xml = $xml->ldb->{$developmentEnvironment};
-        if (!empty($xml)) {
-            $masterSchema = (string) $xml->schemas["master"];
-            if (!$masterSchema) {
-                throw new ConfigurationException("Master schema is mandatory");
-            }
-            $this->masterSchema = $masterSchema;
-            
-            $distributionType = (string) $xml->schemas["type"];
-            if ($distributionType) {
-                if ($distributionType!=SchemaDistribution::DISTRIBUTED && $distributionType!=SchemaDistribution::MIRRORED) {
-                    throw new ConfigurationException("Unknown schema distribution algorithm: ".$distributionType);
-                }
-                $this->distributionType = $distributionType;
-                
-                $this->slaveSchemas = (array) $xml->schemas->slave;
-                if (empty($this->slaveSchemas)) {
-                    throw new ConfigurationException("No slave schema defined!");
-                }
-            }
+        if(!file_exists($xmlFilePath)) {
+            throw new ConfigurationException("Configuration file not found!");
+        }
+        $this->xmlFilePath = $xmlFilePath;
+        $this->developmentEnvironment = $developmentEnvironment;
+        
+        $xmlRoot = \simplexml_load_file($xmlFilePath);
+        $xml = $xmlRoot->lucinda_db->{$developmentEnvironment};
+        if (empty($xml)) {
+            throw new ConfigurationException("Database not configured for environment: ".$developmentEnvironment."!");
+        }
+        
+        $this->setSchemas($xml);
+    }
+    
+    private function setSchemas(\SimpleXMLElement $xml): void
+    {
+        $this->schemas = (array) $xml->schemas->schema;
+        if (empty($this->schemas)) {
+            throw new ConfigurationException("No schemas defined!");
         }
     }
     
-    /**
-     * Gets absolute path to master schema containing DB entries
-     *
-     * @return string
-     */
-    public function getMasterSchema(): string
-    {
-        return $this->masterSchema;
-    }
     
     /**
-     * Gets slaves data distribution type chosen:
-     * - distributed: entry will be persisted on random slave (promoting load balancing)
-     * - mirrored: entry will be persisted on every slave (promoting high availability)
-     *
-     * @return string
-     */
-    public function getDistributionType(): ?string
-    {
-        return $this->distributionType;
-    }
-    
-    /**
-     * Gets absolute paths to slave schemas
+     * Gets absolute paths to schemas
      *
      * @return string[]
      */
-    public function getSlaveSchemas(): array
+    public function getSchemas(): array
     {
         return $this->slaveSchemas;
+    }
+    
+    public function plugIn(string $schema): void
+    {
+        $xmlRoot = \simplexml_load_file($this->xmlFilePath);
+        $parent = $xmlRoot->lucinda_db->{$this->developmentEnvironment}->schemas;
+        $parent->addChild("schema", $schema);
+        $xmlRoot->asXML($this->xmlFilePath);
+        
+        $this->schemas[] = $schema;
+    }
+    
+    public function plugOut(string $schema): void
+    {
+        $xmlRoot = \simplexml_load_file($this->xmlFilePath);
+        $parent = $xmlRoot->lucinda_db->{$this->developmentEnvironment}->schemas;
+        foreach($parent as $i=>$child) {
+            if((string) $child == $schema) {
+                unset($parent->schema[$i]); 
+                break; 
+            }
+        }
+        $xmlRoot->asXML($this->xmlFilePath);
+        
+        foreach ($this->schemas as $i=>$foundSchema) {
+            if($foundSchema == $schema) {
+                unset($this->schemas[$i]);
+            }
+        }
     }
 }

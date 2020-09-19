@@ -16,7 +16,7 @@ class All implements FileInspector
      */
     public function inspect(string $folder, string $file): void
     {
-        if (strpos($file, ".json")!==false) {
+        if (!in_array($file, [".", ".."])) {
             $this->entries[] = substr($file, 0, -5);
         }
     }

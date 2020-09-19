@@ -16,7 +16,7 @@ class Counter implements FileInspector
      */
     public function inspect(string $folder, string $file): void
     {
-        if (strpos($file, ".json")!==false) {
+        if (!in_array($file, [".", ".."])) {
             ++$this->total;
         }
     }

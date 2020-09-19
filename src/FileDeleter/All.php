@@ -8,14 +8,32 @@ use Lucinda\DB\FileDeleter;
  */
 class All implements FileDeleter
 {
+    private $replicas = [];
+    
+    /**
+     * Constructs an all deleter
+     *
+     * @param array $replicas Replicas on whom database is distributed
+     */
+    public function __construct(array $replicas = [])
+    {
+        $this->replicas = $replicas;
+    }
+    
     /**
      * {@inheritDoc}
      * @see \Lucinda\DB\FileDeleter::delete()
      */
     public function delete(string $folder, string $file): bool
     {
-        if (strpos($file, ".json")!==false) {
-            unlink($folder."/".$file);
+        if (!in_array($file, [".", ".."])) {
+            if ($this->replicas) {
+                foreach($this->replicas as $schema) {
+                    unlink($schema."/".$file);
+                }
+            } else {
+                unlink($folder."/".$file);
+            }
             return true;
         } else {
             return false;

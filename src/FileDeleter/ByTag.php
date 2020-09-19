@@ -9,15 +9,18 @@ use Lucinda\DB\FileDeleter;
 class ByTag implements FileDeleter
 {
     private $tag;
+    private $replicas = [];
     
     /**
      * Constructs by tag to match
      *
      * @param string $tag Name of tag to match
+     * @param array $replicas Replicas on whom database is distributed
      */
-    public function __construct(string $tag)
+    public function __construct(string $tag, array $replicas = [])
     {
         $this->tag = $tag;
+        $this->replicas = $replicas;
     }
     
     /**
@@ -26,8 +29,14 @@ class ByTag implements FileDeleter
      */
     public function delete(string $folder, string $file): bool
     {
-        if (preg_match("/(^|_)".$this->tag."(_|\.json)/", $file)==1) {
-            unlink($folder."/".$file);
+        if (!in_array($file, [".", ".."]) && preg_match("/(^|_)".$this->tag."(_|\.json)/", $file)==1) {
+            if ($this->replicas) {
+                foreach($this->replicas as $schema) {
+                    unlink($schema."/".$file);
+                }
+            } else {
+                unlink($folder."/".$file);
+            }
             return true;
         } else {
             return false;

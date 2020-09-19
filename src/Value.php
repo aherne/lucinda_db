@@ -7,7 +7,7 @@ use Lucinda\DB\FileUpdater\Decrement;
 /**
  * Encapsulates value in KV store based on schema and key
  */
-class Value
+class Value implements ValueOperations
 {
     private $schema;
     private $key;

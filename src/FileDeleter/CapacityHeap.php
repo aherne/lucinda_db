@@ -6,23 +6,25 @@ namespace Lucinda\DB\FileDeleter;
  */
 class CapacityHeap extends \SplMaxHeap
 {
-    private $minCapacity;
-    private $maxCapacity;
-    
-    private $totalDeleted = 0;
+    protected $minCapacity;
+    protected $maxCapacity;    
+    protected $totalDeleted = 0;
+    private $schemas = [];
     
     /**
      * Constructs by user-specified maximum/minimum database entry capacity
      *
+     * @param array $schemas Replicas on whom database is distributed
      * @param int $minCapacity Number of entries allowed to remain if database reached max capacity.
      * @param int $maxCapacity Maximum number of entries allowed to exist in database.
      */
-    public function __construct(int $minCapacity, int $maxCapacity)
+    public function __construct(array $schemas, int $minCapacity, int $maxCapacity)
     {
+        $this->schemas = $schemas;
         $this->minCapacity = $minCapacity;
         $this->maxCapacity = $maxCapacity;
     }
-    
+        
     /**
      * {@inheritDoc}
      * @see \SplMaxHeap::compare()
@@ -37,9 +39,9 @@ class CapacityHeap extends \SplMaxHeap
      *
      * @param string $filePath Absolute file location on disk.
      */
-    public function push($filePath)
+    public function push(string $filePath): void
     {
-        $this->insert(["file"=>$filePath, "date"=>filemtime($filePath)]);
+        $this->insert(["file"=>$filePath, "date"=>filemtime($this->schemas[rand(0, sizeof($this->schemas)-1)]."/".$filePath)]);
         
         // reduce size
         $elementsCount = $this->count();
@@ -55,19 +57,21 @@ class CapacityHeap extends \SplMaxHeap
     /**
      * Pops file from queue and deletes it from disk
      */
-    private function pop()
+    protected function pop(): void
     {
         $info = $this->extract();
-        unlink($info["file"]);
+        foreach($this->schemas as $schema) {
+            unlink($schema."/".$info["file"]);
+        }
         $this->totalDeleted++;
     }
     
     /**
      * Gets total number of files deleted
      *
-     * @return number
+     * @return int
      */
-    public function getTotalDeleted()
+    public function getTotalDeleted(): int
     {
         return $this->totalDeleted;
     }

@@ -1,13 +1,11 @@
 <?php
 namespace Test\Lucinda\DB;
 
-use Lucinda\DB\Value;
 use Lucinda\UnitTest\Result;
-use Lucinda\DB\Key;
 use Lucinda\DB\Configuration;
-use Lucinda\DB\Driver;
+use Lucinda\DB\ValueDriver;
 
-class DriverTest
+class ValueDriverTest
 {
     private $object1;
     private $object2;
@@ -31,7 +29,7 @@ class DriverTest
         }
         
         // initialize
-        $this->object1 = new Driver(new Configuration(simplexml_load_string('
+        $this->object1 = new ValueDriver(new Configuration(simplexml_load_string('
 <xml>
     <ldb>
         <local>
@@ -43,7 +41,7 @@ class DriverTest
     </ldb>
 </xml>
 '), "local"), ["a","b"]);
-        $this->object2 = new Driver(new Configuration(simplexml_load_string('
+        $this->object2 = new ValueDriver(new Configuration(simplexml_load_string('
 <xml>
     <ldb>
         <local>

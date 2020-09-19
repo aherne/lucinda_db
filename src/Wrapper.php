@@ -21,13 +21,18 @@ class Wrapper
     }
     
     /**
-     * Gets Driver instance to be used in querying database
+     * Gets instance to be used in working with database entries
      *
      * @param array $tags List of tags key is composed of
-     * @return Driver Instance to be used in querying database
+     * @return ValueDriver Instance to be used in querying database
      */
-    public function getDriver(array $tags): Driver
+    public function getEntryDriver(array $tags): ValueDriver
     {
-        return new Driver($this->configuration, $tags);
+        return new ValueDriver($this->configuration, $tags);
+    }
+    
+    public function getSchemaDriver(string $cacheLocation="schemas.log"): SchemaDriver
+    {
+        return new SchemaDriver($this->configuration, $cacheLocation);
     }
 }
