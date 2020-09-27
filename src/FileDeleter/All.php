@@ -28,7 +28,7 @@ class All implements FileDeleter
     {
         if (!in_array($file, [".", ".."])) {
             if ($this->replicas) {
-                foreach($this->replicas as $schema) {
+                foreach ($this->replicas as $schema) {
                     unlink($schema."/".$file);
                 }
             } else {

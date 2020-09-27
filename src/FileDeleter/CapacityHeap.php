@@ -7,7 +7,7 @@ namespace Lucinda\DB\FileDeleter;
 class CapacityHeap extends \SplMaxHeap
 {
     protected $minCapacity;
-    protected $maxCapacity;    
+    protected $maxCapacity;
     protected $totalDeleted = 0;
     private $schemas = [];
     
@@ -60,7 +60,7 @@ class CapacityHeap extends \SplMaxHeap
     protected function pop(): void
     {
         $info = $this->extract();
-        foreach($this->schemas as $schema) {
+        foreach ($this->schemas as $schema) {
             unlink($schema."/".$info["file"]);
         }
         $this->totalDeleted++;

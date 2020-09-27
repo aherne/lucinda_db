@@ -7,109 +7,60 @@ use Lucinda\DB\ValueDriver;
 
 class ValueDriverTest
 {
-    private $object1;
-    private $object2;
+    private $object;
     
     public function __construct()
     {
-        // cleanup
-        $schemas = ["dbm1", "dbm2", "dbc11", "dbc12", "dbc21", "dbc22"];
-        foreach ($schemas as $schema) {
-            $schema = __DIR__."/".$schema;
-            if (!is_dir($schema)) {
-                mkdir($schema, 0777);
-            } else {
-                $files = scandir($schema);
-                foreach ($files as $file) {
-                    if (strpos($file, ".json")!==false) {
-                        unlink($schema."/".$file);
-                    }
-                }
-            }
-        }
+        mkdir(__DIR__."/myClient1", 0777);
+        mkdir(__DIR__."/myClient2", 0777);
         
         // initialize
-        $this->object1 = new ValueDriver(new Configuration(simplexml_load_string('
-<xml>
-    <ldb>
-        <local>
-            <schemas master="'.__DIR__.'/dbm1" type="distributed">
-                <slave>'.__DIR__.'/dbc11</slave>
-                <slave>'.__DIR__.'/dbc12</slave>
-            </schemas>
-        </local>
-    </ldb>
-</xml>
-'), "local"), ["a","b"]);
-        $this->object2 = new ValueDriver(new Configuration(simplexml_load_string('
-<xml>
-    <ldb>
-        <local>
-            <schemas master="'.__DIR__.'/dbm2" type="mirrored">
-                <slave>'.__DIR__.'/dbc21</slave>
-                <slave>'.__DIR__.'/dbc22</slave>
-            </schemas>
-        </local>
-    </ldb>
-</xml>
-'), "local"), ["a","b"]);
+        $this->object = new ValueDriver(new Configuration(__DIR__."/tests.xml", "local"), ["a","b"]);
+    }
+    
+    public function __destruct()
+    {
+        rmdir(__DIR__."/myClient1");
+        rmdir(__DIR__."/myClient2");
     }
     
     public function set()
     {
         $output = [];
-        $this->object1->set(1);
-        $output[] = new Result($this->test('dbm1', 1) && $this->test('dbc11', 1), "distributed");
-        $this->object2->set(1);
-        $output[] = new Result($this->test('dbm2', 1) && $this->test('dbc21', 1) && $this->test('dbc22', 1), "mirrored");
+        $this->object->set(1);
+        $output[] = new Result($this->test('myClient1', 1) && $this->test('myClient2', 1));
         return $output;
     }
     
     
     public function get()
     {
-        $output = [];
-        $output[] = new Result($this->object1->get()==1, "distributed");
-        $output[] = new Result($this->object2->get()==1, "mirrored");
-        return $output;
+        return new Result($this->object->get()==1);
     }
     
     
     public function exists()
     {
-        $output = [];
-        $output[] = new Result($this->object1->exists(), "distributed");
-        $output[] = new Result($this->object2->exists(), "mirrored");
-        return $output;
+        return new Result($this->object->exists());
     }
     
     
     public function increment()
     {
-        $output = [];
-        $output[] = new Result($this->object1->increment()==2 && $this->object1->get()==2, "distributed");
-        $output[] = new Result($this->object2->increment()==2 && $this->object2->get()==2, "mirrored");
-        return $output;
+        return new Result($this->object->increment()==2 && $this->object->get()==2);
     }
     
     
     public function decrement()
     {
-        $output = [];
-        $output[] = new Result($this->object1->decrement()==1 && $this->object1->get()==1, "distributed");
-        $output[] = new Result($this->object2->decrement()==1 && $this->object2->get()==1, "mirrored");
-        return $output;
+        return new Result($this->object->decrement()==1 && $this->object->get()==1);
     }
     
     
     public function delete()
     {
-        $output = [];
-        $this->object1->delete();
-        $output[] = new Result(!$this->object1->exists() && !$this->test('dbm1', 1) && !$this->test('dbc11', 1), "distributed");
-        $this->object2->delete();
-        $output[] = new Result(!$this->object2->exists() && !$this->test('dbm2', 1) && !$this->test('dbc21', 1) && !$this->test('dbc22', 1), "mirrored");
-        return $output;
+        $this->object->delete();
+        return new Result(!$this->object->exists() && !$this->test('myClient1', 1) && !$this->test('myClient2', 1));
     }
     
     private function test(string $folder, $value): bool

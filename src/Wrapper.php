@@ -11,17 +11,17 @@ class Wrapper
     /**
      * Reads XML file for schema and distribution policies into Configuration object
      *
-     * @param \SimpleXMLElement $xml XML root where ldb tag must be a child
+     * @param string $xmlFilePath Path to XML configuration file
      * @param string $developmentEnvironment Value of development environment
      * @throws ConfigurationException If XML is improperly formatted
      */
-    public function __construct(\SimpleXMLElement $xml, string $developmentEnvironment)
+    public function __construct(string $xmlFilePath, string $developmentEnvironment)
     {
-        $this->configuration = new Configuration($xml, $developmentEnvironment);
+        $this->configuration = new Configuration($xmlFilePath, $developmentEnvironment);
     }
     
     /**
-     * Gets instance to be used in working with database entries
+     * Gets instance to be used in working with distributed database entries
      *
      * @param array $tags List of tags key is composed of
      * @return ValueDriver Instance to be used in querying database
@@ -31,8 +31,13 @@ class Wrapper
         return new ValueDriver($this->configuration, $tags);
     }
     
-    public function getSchemaDriver(string $cacheLocation="schemas.log"): SchemaDriver
+    /**
+     * Gets instance to be used in working with distributed database schemas
+     *
+     * @return SchemaDriver Instance to be used in querying schemas
+     */
+    public function getSchemaDriver(): SchemaDriver
     {
-        return new SchemaDriver($this->configuration, $cacheLocation);
+        return new SchemaDriver($this->configuration);
     }
 }

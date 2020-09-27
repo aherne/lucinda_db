@@ -11,6 +11,7 @@ class ByTagTest
     public function delete()
     {
         $schema = dirname(__DIR__)."/DB";
+        mkdir($schema, 0777);
         $entries = [
             ["tags"=>["a", "b"], "value"=>1, "date"=>"2018-01-02 01:02:03"]
         ];
@@ -21,6 +22,8 @@ class ByTagTest
             touch($schema."/".implode("_", $info["tags"]).".json", strtotime($info["date"]));
         }
         $object = new ByTag("a");
-        return new Result($object->delete($schema, "a_b.json"));
+        $result = new Result($object->delete($schema, "a_b.json"));
+        rmdir($schema);
+        return $result;
     }
 }

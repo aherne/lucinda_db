@@ -11,10 +11,19 @@ class FileTest
     
     public function __construct()
     {
-        $this->object = new File(__DIR__."/DB/x_y.json");
+        $schema = __DIR__."/DB";
+        if (!file_exists($schema)) {
+            mkdir($schema, 0777);
+        }
+        $this->object = new File($schema."/x_y.json");
         if ($this->object->exists()) {
             $this->object->delete();
         }
+    }
+    
+    public function __destruct()
+    {
+        rmdir(__DIR__."/DB");
     }
     
     

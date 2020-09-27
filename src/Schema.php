@@ -6,6 +6,7 @@ use Lucinda\DB\FileDeleter\ByTag as DeleteTag;
 use Lucinda\DB\FileInspector\Counter;
 use Lucinda\DB\FileInspector\All as InspectAll;
 use Lucinda\DB\FileInspector\ByTag as InspectTag;
+use Lucinda\DB\FileInspector\Importer;
 
 /**
  * Encapsulates operations on a LucindaDB folder schema [4,294,967,295]
@@ -58,7 +59,7 @@ class Schema implements SchemaOperations
     }
     
     /**
-     * Gets all keys in schema
+     * Gets all keys in schema sorted alphabetically
      *
      * @return string[] List of keys found in schema
      */
@@ -67,11 +68,13 @@ class Schema implements SchemaOperations
         $all = new InspectAll();
         $folder = new Folder($this->path);
         $folder->scan($all);
-        return $all->getEntries();
+        $result = $all->getEntries();
+        sort($result);
+        return $result;
     }
     
     /**
-     * Gets all keys in schema matching tag
+     * Gets all keys in schema matching tag sorted alphabetically
      *
      * @param string $tag Tag name
      * @return string[] List of keys found in schema
@@ -81,7 +84,9 @@ class Schema implements SchemaOperations
         $all = new InspectTag($tag);
         $folder = new Folder($this->path);
         $folder->scan($all);
-        return $all->getEntries();
+        $result = $all->getEntries();
+        sort($result);
+        return $result;
     }
     
     /**
@@ -96,24 +101,26 @@ class Schema implements SchemaOperations
     }
     
     /**
-     * Deletes entries from schema by tag
+     * Populates schema based on another one
      *
-     * @param string $tag Tag name
-     * @return int Number of entries deleted
+     * @param string $sourceSchema
      */
-    public function deleteByTag(string $tag): int
+    public function populate(string $sourceSchema): void
     {
-        $folder = new Folder($this->path);
-        return $folder->clear(new DeleteTag($tag));
+        $folder = new Folder($sourceSchema);
+        $folder->scan(new Importer($this->path));
     }
     
     /**
      * Drops schema from disk
+     *
+     * @return boolean
      */
-    public function drop(): void
+    public function drop(): bool
     {
         $folder = new Folder($this->path);
         $folder->clear(new DeleteAll());
         $folder->delete();
+        return $folder->exists();
     }
 }

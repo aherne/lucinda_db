@@ -10,6 +10,8 @@ class Configuration
     private $developmentEnvironment;
     
     private $schemas = [];
+    private $pluginLog;
+    private $plugoutLog;
     
     /**
      * Reads XML file for schema and distribution policies.
@@ -20,7 +22,7 @@ class Configuration
      */
     public function __construct(string $xmlFilePath, string $developmentEnvironment)
     {
-        if(!file_exists($xmlFilePath)) {
+        if (!file_exists($xmlFilePath)) {
             throw new ConfigurationException("Configuration file not found!");
         }
         $this->xmlFilePath = $xmlFilePath;
@@ -35,6 +37,12 @@ class Configuration
         $this->setSchemas($xml);
     }
     
+    /**
+     * Set schemas information based on contents of <schemas> tag
+     *
+     * @param \SimpleXMLElement $xml
+     * @throws ConfigurationException
+     */
     private function setSchemas(\SimpleXMLElement $xml): void
     {
         $this->schemas = (array) $xml->schemas->schema;
@@ -45,39 +53,56 @@ class Configuration
     
     
     /**
-     * Gets absolute paths to schemas
+     * Gets absolute paths to XML
      *
      * @return string[]
      */
     public function getSchemas(): array
     {
-        return $this->slaveSchemas;
+        return $this->schemas;
     }
     
-    public function plugIn(string $schema): void
+    /**
+     * Plugs in schema in configuration.
+     *
+     * @param string $schema
+     */
+    public function addSchema(string $schema): void
     {
         $xmlRoot = \simplexml_load_file($this->xmlFilePath);
         $parent = $xmlRoot->lucinda_db->{$this->developmentEnvironment}->schemas;
         $parent->addChild("schema", $schema);
-        $xmlRoot->asXML($this->xmlFilePath);
+        
+        // beautify xml
+        $domxml = new \DOMDocument('1.0');
+        $domxml->preserveWhiteSpace = false;
+        $domxml->formatOutput = true;
+        $domxml->loadXML($xmlRoot->asXML());
+        $domxml->save($this->xmlFilePath);
         
         $this->schemas[] = $schema;
     }
     
-    public function plugOut(string $schema): void
+    /**
+     * Plugs out schema in XML
+     *
+     * @param string $schema
+     */
+    public function removeSchema(string $schema): void
     {
         $xmlRoot = \simplexml_load_file($this->xmlFilePath);
         $parent = $xmlRoot->lucinda_db->{$this->developmentEnvironment}->schemas;
-        foreach($parent as $i=>$child) {
-            if((string) $child == $schema) {
-                unset($parent->schema[$i]); 
-                break; 
+        foreach ($parent->schema as $i=>$child) {
+            if ((string) $child == $schema) {
+                $dom=dom_import_simplexml($child);
+                $dom->parentNode->removeChild($dom);
+                break;
             }
         }
         $xmlRoot->asXML($this->xmlFilePath);
         
         foreach ($this->schemas as $i=>$foundSchema) {
-            if($foundSchema == $schema) {
+            if ($foundSchema == $schema) {
                 unset($this->schemas[$i]);
             }
         }

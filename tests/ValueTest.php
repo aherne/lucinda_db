@@ -12,19 +12,15 @@ class ValueTest
     public function __construct()
     {
         $schema = __DIR__."/DB";
-        if (!is_dir($schema)) {
-            mkdir($schema, 0777);
-        } else {
-            $files = scandir($schema);
-            foreach ($files as $file) {
-                if (strpos($file, ".json")!==false) {
-                    unlink($schema."/".$file);
-                }
-            }
-        }
+        mkdir($schema, 0777);
         
         $key =  new Key(["a","b"]);
         $this->object = new Value($schema, $key->getValue());
+    }
+    
+    public function __destruct()
+    {
+        rmdir(__DIR__."/DB");
     }
 
     public function set()

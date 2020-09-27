@@ -30,7 +30,7 @@ class ValueDriver implements ValueOperations
      */
     public function set($value): void
     {
-        foreach($this->schemas as $schema) {
+        foreach ($this->schemas as $schema) {
             $object = new Value($schema, $this->key);
             $object->set($value);
         }
@@ -69,8 +69,8 @@ class ValueDriver implements ValueOperations
     public function increment(int $step = 1): int
     {
         $value = 0;
-        foreach($this->schemas as $i=>$schema) {
-            if($i==0) {
+        foreach ($this->schemas as $i=>$schema) {
+            if ($i==0) {
                 $object = new Value($schema, $this->key);
                 $value = $object->increment($step);
             } else {
@@ -91,8 +91,8 @@ class ValueDriver implements ValueOperations
     public function decrement(int $step = 1): int
     {
         $value = 0;
-        foreach($this->schemas as $i=>$schema) {
-            if($i==0) {
+        foreach ($this->schemas as $i=>$schema) {
+            if ($i==0) {
                 $object = new Value($schema, $this->key);
                 $value = $object->decrement($step);
             } else {
@@ -110,7 +110,7 @@ class ValueDriver implements ValueOperations
      */
     public function delete(): void
     {
-        foreach($this->schemas as $schema) {
+        foreach ($this->schemas as $schema) {
             $object = new Value($schema, $this->key);
             $object->delete();
         }

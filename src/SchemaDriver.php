@@ -2,13 +2,10 @@
 namespace Lucinda\DB;
 
 use Lucinda\DB\FileDeleter\All as DeleteAll;
-use Lucinda\DB\FileDeleter\ByTag as DeleteTag;
-use Lucinda\DB\FileDeleter\ByModifiedTime as DeleteByModifiedTime;
-use Lucinda\DB\FileDeleter\ByCapacity as DeleteByCapacity;
-use Lucinda\DB\FileInspector\Importer;
 
 class SchemaDriver implements SchemaOperations
 {
+    private $configuration;
     private $schemas = [];
     
     /**
@@ -18,6 +15,7 @@ class SchemaDriver implements SchemaOperations
      */
     public function __construct(Configuration $configuration)
     {
+        $this->configuration = $configuration;
         $this->schemas = $configuration->getSchemas();
     }
         
@@ -66,7 +64,7 @@ class SchemaDriver implements SchemaOperations
     }
     
     /**
-     * Gets all keys in schema
+     * Gets all keys in schema sorted alphabetically
      *
      * @return string[] List of keys found in schema
      */
@@ -77,7 +75,7 @@ class SchemaDriver implements SchemaOperations
     }
     
     /**
-     * Gets all keys in schema matching tag
+     * Gets all keys in schema matching tag sorted alphabetically
      *
      * @param string $tag Tag name
      * @return string[] List of keys found in schema
@@ -100,59 +98,11 @@ class SchemaDriver implements SchemaOperations
     }
     
     /**
-     * Deletes entries from schema by tag
-     *
-     * @param string $tag Tag name
-     * @return int Number of entries deleted
-     */
-    public function deleteByTag(string $tag): int
-    {
-        $folder = new Folder($this->schemas[rand(0, sizeof($this->schemas)-1)]);
-        return $folder->clear(new DeleteTag($tag, $this->schemas));
-    }
-    
-    /**
-     * Deletes entries in schema whose last modified time is earlier than input
-     *
-     * @param int $startTime Unix time starting whom entries won't be deleted
-     * @return int Number of entries deleted
-     */
-    public function deleteUntil(int $startTime): int
-    {
-        $folder = new Folder($this->schemas[rand(0, sizeof($this->schemas)-1)]);
-        return $folder->clear(new DeleteByModifiedTime($startTime, $this->schemas));
-    }
-    
-    /**
-     * Deletes entries from schema exceeding maximum capacity based on last modified time.
-     *
-     * @param int $minCapacity Number of entries allowed to remain if schema reaches max capacity
-     * @param int $maxCapacity Maximum number of entries allowed to exist in schema
-     * @return int Number of entries deleted
-     */
-    public function deleteByCapacity(int $minCapacity, int $maxCapacity): int
-    {
-        $fileDeleter = new DeleteByCapacity($this->schemas, $minCapacity, $maxCapacity);
-        $folder = new Folder($this->schemas[rand(0, sizeof($this->schemas)-1)]);
-        $folder->clear($fileDeleter);
-        return $fileDeleter->getTotal();
-    }
-    
-    /**
-     * Plugs in a new schema and populates it based on first replica
-     * 
-     * @param string $destinationSchema
-     */
-    public function plugIn(string $destinationSchema): void
-    {
-        $folder = new Folder($this->schemas[0]);
-        $folder->scan(new Importer($destinationSchema));
-    }
-    
-    /**
      * Creates schema on disk
+     *
+     * @return boolean
      */
-    public function drop(): void
+    public function drop(): bool
     {
         $result = true;
         foreach ($this->schemas as $schema) {

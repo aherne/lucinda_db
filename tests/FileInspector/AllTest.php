@@ -31,6 +31,6 @@ class AllTest
     
     public function getEntries()
     {
-        return new Result($this->inspector->getEntries()==["a_b", "b_c"]);
+        return new Result($this->inspector->getEntries()==["a_b.json", "b_c.json"]);
     }
 }

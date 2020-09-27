@@ -10,8 +10,10 @@ interface SchemaOperations
     
     /**
      * Drops schema from disk
+     *
+     * @return boolean
      */
-    public function drop(): void;
+    public function drop(): bool;
     
     /**
      * Checks if schema exists and it is writable
@@ -28,14 +30,14 @@ interface SchemaOperations
     public function getCapacity(): int;
     
     /**
-     * Gets all keys in schema
+     * Gets all keys in schema sorted alphabetically
      *
      * @return string[] List of keys found in schema
      */
     public function getAll(): array;
     
     /**
-     * Gets all keys in schema matching tag
+     * Gets all keys in schema matching tag sorted alphabetically
      *
      * @param string $tag Tag name
      * @return string[] List of keys found in schema
@@ -48,12 +50,4 @@ interface SchemaOperations
      * @return int Number of entries deleted
      */
     public function deleteAll(): int;
-    
-    /**
-     * Deletes entries from schema by tag
-     *
-     * @param string $tag Tag name
-     * @return int Number of entries deleted
-     */
-    public function deleteByTag(string $tag): int;
 }

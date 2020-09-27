@@ -4,23 +4,24 @@ namespace Test\Lucinda\DB;
 use Lucinda\DB\Wrapper;
 use Lucinda\DB\ValueDriver;
 use Lucinda\UnitTest\Result;
+use Lucinda\DB\SchemaDriver;
 
 class WrapperTest
 {
-    public function getDriver()
+    private $object;
+    
+    public function __construct()
     {
-        $wrapper = new Wrapper(simplexml_load_string('
-<xml>
-    <ldb>
-        <local>
-            <schemas master="myMaster" type="distributed">
-                <slave>myClient1</slave>
-                <slave>myClient2</slave>
-            </schemas>
-        </local>
-    </ldb>
-</xml>
-'), "local");
-        return new Result($wrapper->getEntryDriver(["a","b"]) instanceof ValueDriver);
+        $this->object = new Wrapper(__DIR__."/tests.xml", "local");
+    }
+    
+    public function getEntryDriver()
+    {
+        return new Result($this->object->getEntryDriver(["a","b"]) instanceof ValueDriver);
+    }
+
+    public function getSchemaDriver()
+    {
+        return new Result($this->object->getSchemaDriver() instanceof SchemaDriver);
     }
 }

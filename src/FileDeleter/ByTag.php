@@ -31,7 +31,7 @@ class ByTag implements FileDeleter
     {
         if (!in_array($file, [".", ".."]) && preg_match("/(^|_)".$this->tag."(_|\.json)/", $file)==1) {
             if ($this->replicas) {
-                foreach($this->replicas as $schema) {
+                foreach ($this->replicas as $schema) {
                     unlink($schema."/".$file);
                 }
             } else {

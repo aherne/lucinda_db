@@ -31,6 +31,6 @@ class ByTagTest
     
     public function getEntries()
     {
-        return new Result($this->inspector->getEntries()==["a_b"]);
+        return new Result($this->inspector->getEntries()==["a_b.json"]);
     }
 }

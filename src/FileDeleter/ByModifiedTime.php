@@ -29,7 +29,7 @@ class ByModifiedTime implements FileDeleter
     public function delete(string $folder, string $file): bool
     {
         if (!in_array($file, [".", ".."]) && filemtime($folder."/".$file) < $this->modifiedTime) {
-            foreach($this->replicas as $schema) {
+            foreach ($this->replicas as $schema) {
                 unlink($schema."/".$file);
             }
             return true;

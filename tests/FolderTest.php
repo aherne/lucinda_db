@@ -46,8 +46,12 @@ class FolderTest
     public function clear()
     {
         file_put_contents($this->folder."/a.json", "x");
-        $result = new Result($this->object->clear(new All())==1);
-        rmdir($this->folder);
-        return $result;
+        return new Result($this->object->clear(new All())==1);
+    }
+    
+    public function delete()
+    {
+        $this->object->delete();
+        return new Result(!$this->object->exists());
     }
 }

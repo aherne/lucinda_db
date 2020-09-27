@@ -23,7 +23,7 @@ class ByTag implements FileInspector
     public function inspect(string $folder, string $file): void
     {
         if (preg_match("/(^|_)".$this->tag."(_|\.json)/", $file)==1) {
-            $this->entries[] = substr($file, 0, -5);
+            $this->entries[] = $file;
         }
     }
     
