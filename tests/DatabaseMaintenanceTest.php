@@ -6,6 +6,7 @@ use Lucinda\DB\Configuration;
 use Lucinda\UnitTest\Result;
 use Lucinda\DB\Schema;
 use Lucinda\DB\SchemaDriver;
+use Lucinda\DB\SchemaStatus;
 
 class DatabaseMaintenanceTest
 {
@@ -35,14 +36,15 @@ class DatabaseMaintenanceTest
     }
     public function __destruct()
     {
-        $driver = new SchemaDriver(new Configuration(__DIR__."/tests.xml", "local"));
+        $configuration = new Configuration(__DIR__."/tests.xml", "local");
+        $driver = new SchemaDriver($configuration->getSchemas());
         $driver->drop();
     }
     
     
     public function checkHealth()
     {
-        return new Result($this->object->checkHealth(0.1)==["tests/myClient1"=>DatabaseMaintenance::STATUS_ONLINE, "tests/myClient2"=>DatabaseMaintenance::STATUS_ONLINE]);
+        return new Result($this->object->checkHealth(0.1)==["tests/myClient1"=>SchemaStatus::ONLINE, "tests/myClient2"=>SchemaStatus::ONLINE]);
     }
 
     public function plugIn()
@@ -88,8 +90,9 @@ class DatabaseMaintenanceTest
     {
         $this->object->deleteByTag("a");
         
-        $schemaDriver = new SchemaDriver(new Configuration(__DIR__."/tests.xml", "local"));
-        return new Result($schemaDriver->getAll()==["b_c.json", "c_d.json", "d_e.json"]);
+        $configuration = new Configuration(__DIR__."/tests.xml", "local");
+        $driver = new SchemaDriver($configuration->getSchemas());
+        return new Result($driver->getAll()==["b_c.json", "c_d.json", "d_e.json"]);
     }
         
 
@@ -97,16 +100,18 @@ class DatabaseMaintenanceTest
     {
         $this->object->deleteUntil(strtotime("2018-02-04 04:05:06"));
         
-        $schemaDriver = new SchemaDriver(new Configuration(__DIR__."/tests.xml", "local"));
-        return new Result($schemaDriver->getAll()==["c_d.json", "d_e.json"]);
+        $configuration = new Configuration(__DIR__."/tests.xml", "local");
+        $driver = new SchemaDriver($configuration->getSchemas());
+        return new Result($driver->getAll()==["c_d.json", "d_e.json"]);
     }
         
 
     public function deleteByCapacity()
     {
         $this->object->deleteByCapacity(1, 2);
-                
-        $schemaDriver = new SchemaDriver(new Configuration(__DIR__."/tests.xml", "local"));
-        return new Result($schemaDriver->getAll()==["d_e.json"]);
+        
+        $configuration = new Configuration(__DIR__."/tests.xml", "local");
+        $driver = new SchemaDriver($configuration->getSchemas());
+        return new Result($driver->getAll()==["d_e.json"]);
     }
 }

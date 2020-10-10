@@ -15,7 +15,8 @@ class ValueDriverTest
         mkdir(__DIR__."/myClient2", 0777);
         
         // initialize
-        $this->object = new ValueDriver(new Configuration(__DIR__."/tests.xml", "local"), ["a","b"]);
+        $configuration = new Configuration(__DIR__."/tests.xml", "local");
+        $this->object = new ValueDriver($configuration->getSchemas(), ["a","b"]);
     }
     
     public function __destruct()

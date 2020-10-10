@@ -24,20 +24,20 @@ class Wrapper
      * Gets instance to be used in working with distributed database entries
      *
      * @param array $tags List of tags key is composed of
-     * @return ValueDriver Instance to be used in querying database
+     * @return ValueOperations Instance to be used in querying database
      */
-    public function getEntryDriver(array $tags): ValueDriver
+    public function getEntryDriver(array $tags): ValueOperations
     {
-        return new ValueDriver($this->configuration, $tags);
+        return new ValueDriver($this->configuration->getSchemas(), $tags);
     }
     
     /**
      * Gets instance to be used in working with distributed database schemas
      *
-     * @return SchemaDriver Instance to be used in querying schemas
+     * @return SchemaOperations Instance to be used in querying schemas
      */
-    public function getSchemaDriver(): SchemaDriver
+    public function getSchemaDriver(): SchemaOperations
     {
-        return new SchemaDriver($this->configuration);
+        return new SchemaDriver($this->configuration->getSchemas());
     }
 }

@@ -13,7 +13,7 @@ class SchemaDriverTest
     public function __construct()
     {
         $this->configuration = new Configuration(__DIR__."/tests.xml", "local");
-        $this->object = new SchemaDriver($this->configuration);
+        $this->object = new SchemaDriver($this->configuration->getSchemas());
     }
 
     public function create()

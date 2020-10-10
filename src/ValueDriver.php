@@ -12,12 +12,12 @@ class ValueDriver implements ValueOperations
     /**
      * Sets up database entry to query based on Configuration object and tags key is composed of
      *
-     * @param Configuration $configuration
+     * @param array $schemas List of schemas value is stored into
      * @param array $tags List of tags key is composed of
      */
-    public function __construct(Configuration $configuration, array $tags)
+    public function __construct(array $schemas, array $tags)
     {
-        $this->schemas = $configuration->getSchemas();
+        $this->schemas = $schemas;
         
         $object = new Key($tags);
         $this->key = $object->getValue();

@@ -5,18 +5,16 @@ use Lucinda\DB\FileDeleter\All as DeleteAll;
 
 class SchemaDriver implements SchemaOperations
 {
-    private $configuration;
     private $schemas = [];
     
     /**
      * Sets up database entry to query based on Configuration object and tags key is composed of
      *
-     * @param Configuration $configuration
+     * @param array $schemas
      */
-    public function __construct(Configuration $configuration)
+    public function __construct(array $schemas)
     {
-        $this->configuration = $configuration;
-        $this->schemas = $configuration->getSchemas();
+        $this->schemas = $schemas;
     }
         
     /**

@@ -13,12 +13,7 @@ use Lucinda\DB\FileDeleter\ByCapacity as DeleteByCapacity;
  * - reducing size based on various algorithms
  */
 class DatabaseMaintenance
-{
-    const STATUS_ONLINE = 1;
-    const STATUS_OFFLINE = 2;
-    const STATUS_UNRESPONSIVE = 3;
-    const STATUS_OVERLOADED = 4;
-    
+{    
     private $configuration;
     
     /**
@@ -33,10 +28,10 @@ class DatabaseMaintenance
     }
     
     /**
-     * Checks schemas health and automatically plugs out those not responsive
+     * Checks schemas health 
      *
      * @param float $maximumWriteDuration Duration in seconds or fractions of seconds.
-     * @return array Statuses for each schema plugged
+     * @return string[SchemaStatus] Statuses for each schema plugged
      */
     public function checkHealth(float $maximumWriteDuration): array
     {
@@ -45,18 +40,18 @@ class DatabaseMaintenance
         foreach ($schemas as $schema) {
             $object = new Schema($schema);
             if (!$object->exists()) {
-                $output[$schema] = self::STATUS_OFFLINE;
+                $output[$schema] = SchemaStatus::OFFLINE;
             } else {
                 $object = new File($schema.DIRECTORY_SEPARATOR."__test__");
                 $start = microtime(true);
                 $object->write("asd");
                 $end = microtime(true);
                 if (!$object->exists() || $object->read()!="asd") {
-                    $output[$schema] = self::STATUS_UNRESPONSIVE;
+                    $output[$schema] = SchemaStatus::UNRESPONSIVE;
                 } elseif (($end-$start) > $maximumWriteDuration) {
-                    $output[$schema] = self::STATUS_OVERLOADED;
+                    $output[$schema] = SchemaStatus::OVERLOADED;
                 } else {
-                    $output[$schema] = self::STATUS_ONLINE;
+                    $output[$schema] = SchemaStatus::ONLINE;
                 }
                 $object->delete();
             }
