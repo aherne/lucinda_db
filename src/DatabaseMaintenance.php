@@ -13,7 +13,7 @@ use Lucinda\DB\FileDeleter\ByCapacity as DeleteByCapacity;
  * - reducing size based on various algorithms
  */
 class DatabaseMaintenance
-{    
+{
     private $configuration;
     
     /**
@@ -28,7 +28,7 @@ class DatabaseMaintenance
     }
     
     /**
-     * Checks schemas health 
+     * Checks schemas health
      *
      * @param float $maximumWriteDuration Duration in seconds or fractions of seconds.
      * @return string[SchemaStatus] Statuses for each schema plugged
@@ -127,16 +127,16 @@ class DatabaseMaintenance
     }
     
     /**
-     * Deletes entries in schemas whose last modified time is earlier than input
+     * Deletes entries in schemas whose last modified time is more than #seconds old
      *
-     * @param int $startTime Unix time starting whom entries won't be deleted
+     * @param int $secondsBeforeNow Number of seconds before now for whom entries will be kept
      * @return int Number of entries deleted
      */
-    public function deleteUntil(int $startTime): int
+    public function deleteUntil(int $secondsBeforeNow): int
     {
         $schemas = $this->configuration->getSchemas();
         $folder = new Folder($schemas[rand(0, sizeof($schemas)-1)]);
-        return $folder->clear(new DeleteByModifiedTime($startTime, $schemas));
+        return $folder->clear(new DeleteByModifiedTime(time()-$secondsBeforeNow, $schemas));
     }
     
     /**
