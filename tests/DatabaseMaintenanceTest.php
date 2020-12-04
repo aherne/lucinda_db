@@ -98,7 +98,7 @@ class DatabaseMaintenanceTest
 
     public function deleteUntil()
     {
-        $this->object->deleteUntil(strtotime("2018-02-04 04:05:06"));
+        $this->object->deleteUntil(time()-strtotime("2018-02-04 04:05:06"));
         
         $configuration = new Configuration(__DIR__."/tests.xml", "local");
         $driver = new SchemaDriver($configuration->getSchemas());
