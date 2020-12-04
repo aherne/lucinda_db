@@ -52,7 +52,7 @@ class File
     public function read()
     {
         $json = json_decode(file_get_contents($this->path), true);
-        if ($json === false) {
+        if ($json===false && json_last_error()!=JSON_ERROR_NONE) {
             throw new JsonException("Value cannot be decoded: ".$this->path);
         }
         return $json;
