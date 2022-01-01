@@ -8,8 +8,8 @@ use Lucinda\DB\FileDeleter;
  */
 class ByTag implements FileDeleter
 {
-    private $tag;
-    private $replicas = [];
+    private string $tag;
+    private array $replicas = [];
     
     /**
      * Constructs by tag to match

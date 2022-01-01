@@ -6,7 +6,7 @@ namespace Lucinda\DB;
  */
 class File
 {
-    private $path;
+    private string $path;
     
     /**
      * Constructs file by absolute path.
@@ -22,15 +22,11 @@ class File
      * Writes file to disk
      *
      * @param mixed $value Value to save as JSON
-     * @throws JsonException If value could not be encoded
+     * @throws \JsonException If value could not be encoded
      */
-    public function write($value): void
+    public function write(mixed $value): void
     {
-        $val = json_encode($value);
-        if ($val === false) {
-            throw new JsonException("Value cannot be encoded!");
-        }
-        file_put_contents($this->path, $val);
+        file_put_contents($this->path, json_encode($value, JSON_THROW_ON_ERROR));
     }
     
     /**
@@ -42,20 +38,16 @@ class File
     {
         return file_exists($this->path);
     }
-    
+
     /**
      * Reads file and returns value
      *
-     * @throws JsonException If value could not be decoded
      * @return mixed
+     * @throws \JsonException If value could not be decoded
      */
-    public function read()
+    public function read(): mixed
     {
-        $json = json_decode(file_get_contents($this->path), true);
-        if ($json===false && json_last_error()!=JSON_ERROR_NONE) {
-            throw new JsonException("Value cannot be decoded: ".$this->path);
-        }
-        return $json;
+        return json_decode(file_get_contents($this->path), true, 512, JSON_THROW_ON_ERROR);
     }
     
     /**
@@ -64,10 +56,10 @@ class File
      * WARNING: this operation is protected by a mutex, but in order to to prevent deadlocks it doesn't wait if mutex could not be acquired
      *
      * @param FileUpdater $callback Encapsulates algorithm of file value update
-     * @throws JsonException If value could not be decoded
+     * @throws \JsonException If value could not be decoded
      * @throws LockException If mutex could not be acquired.
      */
-    public function update(FileUpdater $callback)
+    public function update(FileUpdater $callback): void
     {
         $handle = fopen($this->path, "a+");
         try {
@@ -76,15 +68,12 @@ class File
                     $json = [];
                     $index = fgets($handle);
                     if ($index) {
-                        $json = json_decode($index, true);
-                        if ($json === false) {
-                            throw new JsonException("Value cannot be decoded: ".$this->path);
-                        }
+                        $json = json_decode($index, true, 512, JSON_THROW_ON_ERROR);
                     }
                     $changed = $callback->update($json);
                     if ($changed) {
                         ftruncate($handle, 0);
-                        fwrite($handle, json_encode($json));
+                        fwrite($handle, json_encode($json, JSON_THROW_ON_ERROR));
                     }
                 } finally {
                     fflush($handle);
@@ -101,7 +90,7 @@ class File
     /**
      * Deletes file from disk
      */
-    public function delete()
+    public function delete(): void
     {
         unlink($this->path);
     }

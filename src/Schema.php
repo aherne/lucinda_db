@@ -13,7 +13,7 @@ use Lucinda\DB\FileInspector\Importer;
  */
 class Schema implements SchemaOperations
 {
-    private $path;
+    private string $path;
     
     /**
      * Constructs based on schema folder

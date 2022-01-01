@@ -14,24 +14,26 @@ use Lucinda\DB\FileDeleter\ByCapacity as DeleteByCapacity;
  */
 class DatabaseMaintenance
 {
-    private $configuration;
-    
+    private Configuration $configuration;
+
     /**
      * Automatically plugs in
      *
      * @param string $xmlFilePath
      * @param string $developmentEnvironment
+     * @throws ConfigurationException If XML is invalid
      */
     public function __construct(string $xmlFilePath, string $developmentEnvironment)
     {
         $this->configuration = new Configuration($xmlFilePath, $developmentEnvironment);
     }
-    
+
     /**
      * Checks schemas health
      *
      * @param float $maximumWriteDuration Duration in seconds or fractions of seconds.
-     * @return string[SchemaStatus] Statuses for each schema plugged
+     * @return SchemaStatus[string] Statuses for each schema plugged
+     * @throws \JsonException If values could not be decoded
      */
     public function checkHealth(float $maximumWriteDuration): array
     {

@@ -8,7 +8,7 @@ use Lucinda\DB\FileInspector;
  */
 class All implements FileInspector
 {
-    private $entries = [];
+    private array $entries = [];
     
     /**
      * {@inheritDoc}

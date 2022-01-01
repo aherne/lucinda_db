@@ -6,7 +6,7 @@ namespace Lucinda\DB;
  */
 class Wrapper
 {
-    private $configuration;
+    private Configuration $configuration;
     
     /**
      * Reads XML file for schema and distribution policies into Configuration object
@@ -19,12 +19,13 @@ class Wrapper
     {
         $this->configuration = new Configuration($xmlFilePath, $developmentEnvironment);
     }
-    
+
     /**
      * Gets instance to be used in working with distributed database entries
      *
      * @param array $tags List of tags key is composed of
      * @return ValueOperations Instance to be used in querying database
+     * @throws KeyException
      */
     public function getEntryDriver(array $tags): ValueOperations
     {

@@ -7,7 +7,7 @@ namespace Lucinda\DB;
 interface FileInspector
 {
     /**
-     * Inspecs entry in DB
+     * Inspects entry in DB
      *
      * @param string $folder Schema folder containing file to inspect
      * @param string $file File to inspect

@@ -6,13 +6,10 @@ namespace Lucinda\DB;
  */
 class Configuration
 {
-    private $xmlFilePath;
-    private $developmentEnvironment;
-    
-    private $schemas = [];
-    private $pluginLog;
-    private $plugoutLog;
-    
+    private string $xmlFilePath;
+    private string $developmentEnvironment;
+    private array $schemas = [];
+
     /**
      * Reads XML file for schema and distribution policies.
      *

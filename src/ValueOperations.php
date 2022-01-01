@@ -11,7 +11,7 @@ interface ValueOperations
      *
      * @param mixed $value
      */
-    public function set($value): void;
+    public function set(mixed $value): void;
     
     /**
      * Gets existing entry value
@@ -19,7 +19,7 @@ interface ValueOperations
      * @throws KeyNotFoundException If entry doesn't exist
      * @return mixed
      */
-    public function get();
+    public function get(): mixed;
     
     /**
      * Checks if entry exists

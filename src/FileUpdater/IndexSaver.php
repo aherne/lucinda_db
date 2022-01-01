@@ -8,8 +8,8 @@ use Lucinda\DB\FileUpdater;
  */
 class IndexSaver implements FileUpdater
 {
-    private $schema;
-    private $key;
+    private string $schema;
+    private string $key;
     
     /**
      * Constructs by entry key

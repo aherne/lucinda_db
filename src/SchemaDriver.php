@@ -5,7 +5,7 @@ use Lucinda\DB\FileDeleter\All as DeleteAll;
 
 class SchemaDriver implements SchemaOperations
 {
-    private $schemas = [];
+    private array $schemas = [];
     
     /**
      * Sets up database entry to query based on Configuration object and tags key is composed of

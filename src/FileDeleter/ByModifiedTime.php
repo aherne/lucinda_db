@@ -8,13 +8,14 @@ use Lucinda\DB\FileDeleter;
  */
 class ByModifiedTime implements FileDeleter
 {
-    private $modifiedTime;
-    private $replicas = [];
+    private int $modifiedTime;
+    private array $replicas = [];
     
     /**
      * Constructs by user-specified minimum last modified time
      *
      * @param int $modifiedTime
+     * @param array $replicas
      */
     public function __construct(int $modifiedTime, array $replicas)
     {

@@ -11,7 +11,7 @@ interface FileDeleter
      *
      * @param string $folder Schema folder containing file to delete
      * @param string $file File to delete
-     * @return bool Whether or not delete was performed
+     * @return bool Whether delete was performed
      */
     public function delete(string $folder, string $file): bool;
 }

@@ -8,7 +8,7 @@ use Lucinda\DB\FileInspector;
  */
 class Counter implements FileInspector
 {
-    private $total = 0;
+    private int $total = 0;
     
     /**
      * {@inheritDoc}

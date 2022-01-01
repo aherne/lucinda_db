@@ -8,7 +8,7 @@ use Lucinda\DB\FileInspector;
  */
 class Importer implements FileInspector
 {
-    private $destinationSchema;
+    private string $destinationSchema;
     
     public function __construct(string $destinationSchema)
     {

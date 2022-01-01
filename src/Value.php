@@ -9,8 +9,8 @@ use Lucinda\DB\FileUpdater\Decrement;
  */
 class Value implements ValueOperations
 {
-    private $schema;
-    private $key;
+    private string $schema;
+    private string $key;
     
     /**
      * Constructs entry based on schema folder and tags it depends on
@@ -23,25 +23,27 @@ class Value implements ValueOperations
         $this->schema = $schema;
         $this->key = $key;
     }
-    
+
     /**
      * Sets entry value
      *
      * @param mixed $value
+     * @throws \JsonException
      */
-    public function set($value): void
+    public function set(mixed $value): void
     {
         $file1 = new File($this->schema."/".$this->key.".json");
         $file1->write($value);
     }
-    
+
     /**
      * Gets existing entry value
      *
      * @throws KeyNotFoundException If entry doesn't exist
+     * @throws \JsonException
      * @return mixed
      */
-    public function get()
+    public function get(): mixed
     {
         $file = new File($this->schema."/".$this->key.".json");
         if (!$file->exists()) {
@@ -66,6 +68,8 @@ class Value implements ValueOperations
      *
      * @param int $step Step of incrementation
      * @throws KeyNotFoundException If entry doesn't exist
+     * @throws \JsonException If value could not be decoded
+     * @throws LockException If mutex could not be acquired.
      * @return int
      */
     public function increment(int $step = 1): int
@@ -86,6 +90,8 @@ class Value implements ValueOperations
      *
      * @param int $step Step of decrementation
      * @throws KeyNotFoundException If entry doesn't exist
+     * @throws \JsonException If value could not be decoded
+     * @throws LockException If mutex could not be acquired.
      * @return int
      */
     public function decrement(int $step = 1): int
@@ -97,7 +103,7 @@ class Value implements ValueOperations
         
         $fileUpdater = new Decrement($this->schema."/".$this->key.".json", $step);
         $file->update($fileUpdater);
-        
+
         return $fileUpdater->getValue();
     }
     

@@ -155,7 +155,7 @@ $value = $wrapper->getEntryDriver(["users", "roles"]);
 $value->set(["John Doe"=>["Administrator"], "Jane Doe"=>["Assistant Manager", "Team Leader"]]);
 ```
 
-API uses composer autoload, requires PHP 7.1+ and has no external dependencies except SimpleXML, DOM and SPL extensions. All code inside is 100% unit tested and developed on simplicity and elegance principles!
+API uses composer autoload, requires PHP 8.1+ and has no external dependencies except SimpleXML, DOM and SPL extensions. All code inside is 100% unit tested and developed on simplicity and elegance principles!
 
 ## Configuration
 

@@ -6,12 +6,13 @@ namespace Lucinda\DB;
  */
 class Key
 {
-    private $value;
-    
+    private string $value;
+
     /**
      * Constructs key based on composing tags
      *
      * @param array $tags List of tags key is composed of
+     * @throws KeyException
      */
     public function __construct(array $tags)
     {

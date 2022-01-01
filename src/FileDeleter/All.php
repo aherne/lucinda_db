@@ -8,7 +8,7 @@ use Lucinda\DB\FileDeleter;
  */
 class All implements FileDeleter
 {
-    private $replicas = [];
+    private array $replicas = [];
     
     /**
      * Constructs an all deleter

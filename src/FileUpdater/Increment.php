@@ -8,9 +8,9 @@ use Lucinda\DB\FileUpdater;
  */
 class Increment implements FileUpdater
 {
-    private $key;
-    private $step;
-    private $value;
+    private string $key;
+    private int $step;
+    private int $value;
     
     /**
      * Constructs by entry key
@@ -28,7 +28,7 @@ class Increment implements FileUpdater
      * {@inheritDoc}
      * @see \Lucinda\DB\FileUpdater::update()
      */
-    public function update(&$json): bool
+    public function update(mixed &$json): bool
     {
         $json += $this->step;
         $this->value = $json;

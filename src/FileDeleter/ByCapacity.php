@@ -8,7 +8,7 @@ use Lucinda\DB\FileDeleter;
  */
 class ByCapacity implements FileDeleter
 {
-    private $capacityHeap;
+    private CapacityHeap $capacityHeap;
     
     /**
      * Constructs by user-specified maximum database entry capacity

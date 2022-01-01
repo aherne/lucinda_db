@@ -8,7 +8,7 @@ use Lucinda\DB\FileUpdater;
  */
 class IndexDeleter implements FileUpdater
 {
-    private $key;
+    private string $key;
     
     /**
      * Constructs by entry key

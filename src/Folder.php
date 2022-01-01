@@ -6,7 +6,7 @@ namespace Lucinda\DB;
  */
 class Folder
 {
-    private $path;
+    private string $path;
     
     /**
      * Constructs folder by absolute path
@@ -85,7 +85,7 @@ class Folder
     /**
      * Deletes folder from disk
      */
-    public function delete()
+    public function delete(): void
     {
         rmdir($this->path);
     }

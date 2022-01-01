@@ -8,8 +8,8 @@ use Lucinda\DB\FileInspector;
  */
 class ByTag implements FileInspector
 {
-    private $tag;
-    private $entries = [];
+    private string $tag;
+    private array $entries = [];
     
     public function __construct(string $tag)
     {

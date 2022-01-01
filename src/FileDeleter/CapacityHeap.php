@@ -6,10 +6,10 @@ namespace Lucinda\DB\FileDeleter;
  */
 class CapacityHeap extends \SplMaxHeap
 {
-    protected $minCapacity;
-    protected $maxCapacity;
-    protected $totalDeleted = 0;
-    private $schemas = [];
+    protected int $minCapacity;
+    protected int $maxCapacity;
+    protected int $totalDeleted = 0;
+    private array $schemas = [];
     
     /**
      * Constructs by user-specified maximum/minimum database entry capacity
@@ -29,7 +29,7 @@ class CapacityHeap extends \SplMaxHeap
      * {@inheritDoc}
      * @see \SplMaxHeap::compare()
      */
-    protected function compare($value1, $value2)
+    protected function compare(mixed $value1, mixed $value2): int
     {
         return $value2["date"]-$value1["date"];
     }
