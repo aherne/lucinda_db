@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB;
 
 use Lucinda\DB\FileDeleter\ByTag as DeleteTag;
@@ -19,8 +20,8 @@ class DatabaseMaintenance
     /**
      * Automatically plugs in
      *
-     * @param string $xmlFilePath
-     * @param string $developmentEnvironment
+     * @param  string $xmlFilePath
+     * @param  string $developmentEnvironment
      * @throws ConfigurationException If XML is invalid
      */
     public function __construct(string $xmlFilePath, string $developmentEnvironment)
@@ -31,8 +32,8 @@ class DatabaseMaintenance
     /**
      * Checks schemas health
      *
-     * @param float $maximumWriteDuration Duration in seconds or fractions of seconds.
-     * @return SchemaStatus[string] Statuses for each schema plugged
+     * @param  float $maximumWriteDuration Duration in seconds or fractions of seconds.
+     * @return array<string,SchemaStatus> Statuses for each schema plugged
      * @throws \JsonException If values could not be decoded
      */
     public function checkHealth(float $maximumWriteDuration): array
@@ -60,65 +61,65 @@ class DatabaseMaintenance
         }
         return $output;
     }
-    
+
     /**
      * Plugs in schema to DB
      *
-     * @param string $schema
+     * @param  string $schema
      * @throws ConfigurationException
      */
-    public function plugIn(string $schema)
+    public function plugIn(string $schema): void
     {
         $object = new Schema($schema);
-        
-        if (!$object->exists($schema)) {
+
+        if (!$object->exists()) {
             throw new ConfigurationException("Schema to plug in not found: ".$schema);
         }
-        
+
         if (in_array($schema, $this->configuration->getSchemas())) {
             throw new ConfigurationException("Schema already plugged!");
         }
-        
-        
+
+
         // import files into new schema
         $object->populate($this->configuration->getSchemas()[0]);
-        
+
         // plug in schema in XML
         $this->configuration->addSchema($schema);
-        
+
         // import any remaining files that may have been inserted by different processes as steps above unfolded
         $object->populate($this->configuration->getSchemas()[0]);
     }
-    
+
     /**
      * Plugs out schema from db
      *
-     * @param string $schema
+     * @param  string $schema
      * @throws ConfigurationException
      */
-    public function plugOut(string $schema)
+    public function plugOut(string $schema): void
     {
         $object = new Schema($schema);
-        
+
         if (!$object->exists()) {
             throw new ConfigurationException("Schema to plug out not found: ".$schema);
         }
-        
+
         if (!in_array($schema, $this->configuration->getSchemas())) {
             throw new ConfigurationException("Schema not plugged!");
         }
-        
+
         // plug out schema in XML
         $this->configuration->removeSchema($schema);
-        
+
         // clear schema of files
         $object->deleteAll();
     }
-    
+
     /**
      * Deletes entries from schemas by tag
      *
-     * @param string $tag Tag name
+     * @param  string $tag Tag name
      * @return int Number of entries deleted
      */
     public function deleteByTag(string $tag): int
@@ -127,11 +128,11 @@ class DatabaseMaintenance
         $folder = new Folder($schemas[rand(0, sizeof($schemas)-1)]);
         return $folder->clear(new DeleteTag($tag, $schemas));
     }
-    
+
     /**
      * Deletes entries in schemas whose last modified time is more than #seconds old
      *
-     * @param int $secondsBeforeNow Number of seconds before now for whom entries will be kept
+     * @param  int $secondsBeforeNow Number of seconds before now for whom entries will be kept
      * @return int Number of entries deleted
      */
     public function deleteUntil(int $secondsBeforeNow): int
@@ -140,12 +141,12 @@ class DatabaseMaintenance
         $folder = new Folder($schemas[rand(0, sizeof($schemas)-1)]);
         return $folder->clear(new DeleteByModifiedTime(time()-$secondsBeforeNow, $schemas));
     }
-    
+
     /**
      * Deletes entries from schemas exceeding maximum capacity based on last modified time.
      *
-     * @param int $minCapacity Number of entries allowed to remain if schema reaches max capacity
-     * @param int $maxCapacity Maximum number of entries allowed to exist in schema
+     * @param  int $minCapacity Number of entries allowed to remain if schema reaches max capacity
+     * @param  int $maxCapacity Maximum number of entries allowed to exist in schema
      * @return int Number of entries deleted
      */
     public function deleteByCapacity(int $minCapacity, int $maxCapacity): int

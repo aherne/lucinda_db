@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB;
 
 /**
@@ -7,7 +8,7 @@ namespace Lucinda\DB;
 class Folder
 {
     private string $path;
-    
+
     /**
      * Constructs folder by absolute path
      *
@@ -17,18 +18,18 @@ class Folder
     {
         $this->path =$path;
     }
-    
+
     /**
      * Creates folder
      *
-     * @param int $permissions Rights folder is
+     * @param  int $permissions Rights folder is
      * @return bool Whether or not folder was created
      */
     public function create(int $permissions): bool
     {
         return mkdir($this->path, $permissions);
     }
-    
+
     /**
      * Checks if folder exists
      *
@@ -38,7 +39,7 @@ class Folder
     {
         return is_dir($this->path);
     }
-    
+
     /**
      * Checks if folder is writable
      *
@@ -48,7 +49,7 @@ class Folder
     {
         return is_writable($this->path);
     }
-    
+
     /**
      * Scans folder of files and applies inspection algorithm on each entry
      *
@@ -62,11 +63,11 @@ class Folder
         }
         closedir($handle);
     }
-    
+
     /**
      * Clears folder of files matching callback and returns how many were deleted
      *
-     * @param FileDeleter $deleter Encapsulates algorithm of file deletion
+     * @param  FileDeleter $deleter Encapsulates algorithm of file deletion
      * @return int Number of files deleted
      */
     public function clear(FileDeleter $deleter): int
@@ -81,7 +82,7 @@ class Folder
         closedir($handle);
         return $result;
     }
-    
+
     /**
      * Deletes folder from disk
      */

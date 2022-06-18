@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\DB\FileDeleter;
 
 use Lucinda\DB\FileDeleter\ByCapacity;
@@ -10,7 +11,7 @@ class ByCapacityTest
 {
     private $object;
     private $schema;
-    
+
     public function __construct()
     {
         $this->schema = dirname(__DIR__)."/DB";
@@ -29,7 +30,7 @@ class ByCapacityTest
         }
         $this->object = new ByCapacity([$this->schema], 2, 3);
     }
-    
+
     public function __destruct()
     {
         $files = scandir($this->schema);

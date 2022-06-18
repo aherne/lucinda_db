@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB\FileInspector;
 
 use Lucinda\DB\FileInspector;
@@ -9,9 +10,10 @@ use Lucinda\DB\FileInspector;
 class Counter implements FileInspector
 {
     private int $total = 0;
-    
+
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\DB\FileInspector::inspect()
      */
     public function inspect(string $folder, string $file): void
@@ -20,7 +22,7 @@ class Counter implements FileInspector
             ++$this->total;
         }
     }
-    
+
     /**
      * Gets total number of entries found in schema
      *

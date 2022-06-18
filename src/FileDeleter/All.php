@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB\FileDeleter;
 
 use Lucinda\DB\FileDeleter;
@@ -8,20 +9,24 @@ use Lucinda\DB\FileDeleter;
  */
 class All implements FileDeleter
 {
+    /**
+     * @var string[]
+     */
     private array $replicas = [];
-    
+
     /**
      * Constructs an all deleter
      *
-     * @param array $replicas Replicas on whom database is distributed
+     * @param string[] $replicas Replicas on whom database is distributed
      */
     public function __construct(array $replicas = [])
     {
         $this->replicas = $replicas;
     }
-    
+
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\DB\FileDeleter::delete()
      */
     public function delete(string $folder, string $file): bool

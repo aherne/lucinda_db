@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\DB;
 
 use Lucinda\DB\Key;

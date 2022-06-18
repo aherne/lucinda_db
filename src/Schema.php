@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB;
 
 use Lucinda\DB\FileDeleter\All as DeleteAll;
@@ -14,7 +15,7 @@ use Lucinda\DB\FileInspector\Importer;
 class Schema implements SchemaOperations
 {
     private string $path;
-    
+
     /**
      * Constructs based on schema folder
      *
@@ -24,7 +25,7 @@ class Schema implements SchemaOperations
     {
         $this->path = $schema;
     }
-    
+
     /**
      * Creates schema on disk
      */
@@ -33,7 +34,7 @@ class Schema implements SchemaOperations
         $folder = new Folder($this->path);
         return $folder->create(0777);
     }
-    
+
     /**
      * Checks if schema exists and it is writable
      *
@@ -44,7 +45,7 @@ class Schema implements SchemaOperations
         $object = new Folder($this->path);
         return ($object->exists() && $object->isWritable());
     }
-    
+
     /**
      * Gets number of entries in schema
      *
@@ -57,7 +58,7 @@ class Schema implements SchemaOperations
         $folder->scan($counter);
         return $counter->getValue();
     }
-    
+
     /**
      * Gets all keys in schema sorted alphabetically
      *
@@ -72,11 +73,11 @@ class Schema implements SchemaOperations
         sort($result);
         return $result;
     }
-    
+
     /**
      * Gets all keys in schema matching tag sorted alphabetically
      *
-     * @param string $tag Tag name
+     * @param  string $tag Tag name
      * @return string[] List of keys found in schema
      */
     public function getByTag(string $tag): array
@@ -88,7 +89,7 @@ class Schema implements SchemaOperations
         sort($result);
         return $result;
     }
-    
+
     /**
      * Deletes all entries in schema
      *
@@ -99,7 +100,7 @@ class Schema implements SchemaOperations
         $folder = new Folder($this->path);
         return $folder->clear(new DeleteAll());
     }
-    
+
     /**
      * Populates schema based on another one
      *
@@ -110,7 +111,7 @@ class Schema implements SchemaOperations
         $folder = new Folder($sourceSchema);
         $folder->scan(new Importer($this->path));
     }
-    
+
     /**
      * Drops schema from disk
      *

@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB;
 
 /**
@@ -7,12 +8,12 @@ namespace Lucinda\DB;
 class Wrapper
 {
     private Configuration $configuration;
-    
+
     /**
      * Reads XML file for schema and distribution policies into Configuration object
      *
-     * @param string $xmlFilePath Path to XML configuration file
-     * @param string $developmentEnvironment Value of development environment
+     * @param  string $xmlFilePath            Path to XML configuration file
+     * @param  string $developmentEnvironment Value of development environment
      * @throws ConfigurationException If XML is improperly formatted
      */
     public function __construct(string $xmlFilePath, string $developmentEnvironment)
@@ -23,7 +24,7 @@ class Wrapper
     /**
      * Gets instance to be used in working with distributed database entries
      *
-     * @param array $tags List of tags key is composed of
+     * @param  string[] $tags List of tags key is composed of
      * @return ValueOperations Instance to be used in querying database
      * @throws KeyException
      */
@@ -31,7 +32,7 @@ class Wrapper
     {
         return new ValueDriver($this->configuration->getSchemas(), $tags);
     }
-    
+
     /**
      * Gets instance to be used in working with distributed database schemas
      *

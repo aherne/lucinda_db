@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\DB\FileInspector;
 
 use Lucinda\DB\FileInspector\All;
@@ -8,12 +9,12 @@ use Lucinda\UnitTest\Result;
 class AllTest
 {
     private $inspector;
-    
+
     public function __construct()
     {
         $this->inspector = new All();
     }
-    
+
     public function inspect()
     {
         $schema = dirname(__DIR__)."/DB";
@@ -27,8 +28,8 @@ class AllTest
         }
         return new Result(true);
     }
-    
-    
+
+
     public function getEntries()
     {
         return new Result($this->inspector->getEntries()==["a_b.json", "b_c.json"]);

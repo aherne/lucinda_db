@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB\FileDeleter;
 
 use Lucinda\DB\FileDeleter;
@@ -9,21 +10,22 @@ use Lucinda\DB\FileDeleter;
 class ByCapacity implements FileDeleter
 {
     private CapacityHeap $capacityHeap;
-    
+
     /**
      * Constructs by user-specified maximum database entry capacity
      *
-     * @param array $replicas Replicas on whom database is distributed
-     * @param int $minCapacity Number of entries allowed to remain if database reached max capacity.
-     * @param int $maxCapacity Maximum number of entries allowed to exist in database.
+     * @param string[] $replicas    Replicas on whom database is distributed
+     * @param int      $minCapacity Number of entries allowed to remain if database reached max capacity.
+     * @param int      $maxCapacity Maximum number of entries allowed to exist in database.
      */
     public function __construct(array $replicas, int $minCapacity, int $maxCapacity)
     {
         $this->capacityHeap = new CapacityHeap($replicas, $minCapacity, $maxCapacity);
     }
-    
+
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\DB\FileDeleter::delete()
      */
     public function delete(string $folder, string $file): bool
@@ -33,7 +35,7 @@ class ByCapacity implements FileDeleter
         }
         return false;
     }
-    
+
     /**
      * Gets total of elements deleted
      *

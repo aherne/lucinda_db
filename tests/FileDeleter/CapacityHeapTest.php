@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\DB\FileDeleter;
 
 use Lucinda\DB\Value;
@@ -10,7 +11,7 @@ class CapacityHeapTest
 {
     private $object;
     private $schema;
-    
+
     public function __construct()
     {
         $this->schema = dirname(__DIR__)."/DB";
@@ -29,7 +30,7 @@ class CapacityHeapTest
         }
         $this->object = new CapacityHeap([$this->schema], 2, 3);
     }
-    
+
     public function __destruct()
     {
         $files = scandir($this->schema);
@@ -40,7 +41,7 @@ class CapacityHeapTest
         }
         rmdir($this->schema);
     }
-    
+
 
     public function push()
     {
@@ -50,7 +51,7 @@ class CapacityHeapTest
         $this->object->push("d_e.json");
         return new Result(true);
     }
-        
+
 
     public function getTotalDeleted()
     {

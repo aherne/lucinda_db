@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB\FileInspector;
 
 use Lucinda\DB\FileInspector;
@@ -9,14 +10,15 @@ use Lucinda\DB\FileInspector;
 class Importer implements FileInspector
 {
     private string $destinationSchema;
-    
+
     public function __construct(string $destinationSchema)
     {
         $this->destinationSchema = $destinationSchema;
     }
-    
+
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\DB\FileInspector::inspect()
      */
     public function inspect(string $folder, string $file): void

@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB;
 
 use Lucinda\DB\FileUpdater\Increment;
@@ -11,12 +12,12 @@ class Value implements ValueOperations
 {
     private string $schema;
     private string $key;
-    
+
     /**
      * Constructs entry based on schema folder and tags it depends on
      *
      * @param string $schema Folder holding entries
-     * @param string $key Value of entry key
+     * @param string $key    Value of entry key
      */
     public function __construct(string $schema, string $key)
     {
@@ -27,7 +28,7 @@ class Value implements ValueOperations
     /**
      * Sets entry value
      *
-     * @param mixed $value
+     * @param  mixed $value
      * @throws \JsonException
      */
     public function set(mixed $value): void
@@ -51,7 +52,7 @@ class Value implements ValueOperations
         }
         return $file->read();
     }
-    
+
     /**
      * Checks if entry exists
      *
@@ -62,11 +63,11 @@ class Value implements ValueOperations
         $file = new File($this->schema."/".$this->key.".json");
         return $file->exists();
     }
-    
+
     /**
      * Increments existing entry and returns value
      *
-     * @param int $step Step of incrementation
+     * @param  int $step Step of incrementation
      * @throws KeyNotFoundException If entry doesn't exist
      * @throws \JsonException If value could not be decoded
      * @throws LockException If mutex could not be acquired.
@@ -78,17 +79,17 @@ class Value implements ValueOperations
         if (!$file->exists()) {
             throw new KeyNotFoundException($this->key);
         }
-        
-        $fileUpdater = new Increment($this->schema."/".$this->key.".json", $step);
+
+        $fileUpdater = new Increment($step);
         $file->update($fileUpdater);
-        
+
         return $fileUpdater->getValue();
     }
-    
+
     /**
      * Decrements existing entry and returns value
      *
-     * @param int $step Step of decrementation
+     * @param  int $step Step of decrementation
      * @throws KeyNotFoundException If entry doesn't exist
      * @throws \JsonException If value could not be decoded
      * @throws LockException If mutex could not be acquired.
@@ -100,13 +101,13 @@ class Value implements ValueOperations
         if (!$file->exists()) {
             throw new KeyNotFoundException($this->key);
         }
-        
-        $fileUpdater = new Decrement($this->schema."/".$this->key.".json", $step);
+
+        $fileUpdater = new Decrement($step);
         $file->update($fileUpdater);
 
         return $fileUpdater->getValue();
     }
-    
+
     /**
      * Deletes existing entry
      *

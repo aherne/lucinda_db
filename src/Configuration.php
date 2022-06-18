@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB;
 
 /**
@@ -8,13 +9,16 @@ class Configuration
 {
     private string $xmlFilePath;
     private string $developmentEnvironment;
+    /**
+     * @var string[]
+     */
     private array $schemas = [];
 
     /**
      * Reads XML file for schema and distribution policies.
      *
-     * @param string $xmlFilePath Path to XML configuration file
-     * @param string $developmentEnvironment Value of development environment
+     * @param  string $xmlFilePath            Path to XML configuration file
+     * @param  string $developmentEnvironment Value of development environment
      * @throws ConfigurationException If XML is improperly formatted
      */
     public function __construct(string $xmlFilePath, string $developmentEnvironment)
@@ -24,20 +28,20 @@ class Configuration
         }
         $this->xmlFilePath = $xmlFilePath;
         $this->developmentEnvironment = $developmentEnvironment;
-        
+
         $xmlRoot = \simplexml_load_file($xmlFilePath);
         $xml = $xmlRoot->lucinda_db->{$developmentEnvironment};
         if (empty($xml)) {
             throw new ConfigurationException("Database not configured for environment: ".$developmentEnvironment."!");
         }
-        
+
         $this->setSchemas($xml);
     }
-    
+
     /**
      * Set schemas information based on contents of <schemas> tag
      *
-     * @param \SimpleXMLElement $xml
+     * @param  \SimpleXMLElement $xml
      * @throws ConfigurationException
      */
     private function setSchemas(\SimpleXMLElement $xml): void
@@ -47,8 +51,8 @@ class Configuration
             throw new ConfigurationException("No schemas defined!");
         }
     }
-    
-    
+
+
     /**
      * Gets absolute paths to XML
      *
@@ -58,7 +62,7 @@ class Configuration
     {
         return $this->schemas;
     }
-    
+
     /**
      * Plugs in schema in configuration.
      *
@@ -69,17 +73,17 @@ class Configuration
         $xmlRoot = \simplexml_load_file($this->xmlFilePath);
         $parent = $xmlRoot->lucinda_db->{$this->developmentEnvironment}->schemas;
         $parent->addChild("schema", $schema);
-        
+
         // beautify xml
         $domxml = new \DOMDocument('1.0');
         $domxml->preserveWhiteSpace = false;
         $domxml->formatOutput = true;
         $domxml->loadXML($xmlRoot->asXML());
         $domxml->save($this->xmlFilePath);
-        
+
         $this->schemas[] = $schema;
     }
-    
+
     /**
      * Plugs out schema in XML
      *
@@ -97,7 +101,7 @@ class Configuration
             }
         }
         $xmlRoot->asXML($this->xmlFilePath);
-        
+
         foreach ($this->schemas as $i=>$foundSchema) {
             if ($foundSchema == $schema) {
                 unset($this->schemas[$i]);

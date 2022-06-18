@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB;
 
 /**
@@ -10,7 +11,7 @@ interface FileInspector
      * Inspects entry in DB
      *
      * @param string $folder Schema folder containing file to inspect
-     * @param string $file File to inspect
+     * @param string $file   File to inspect
      */
     public function inspect(string $folder, string $file): void;
 }

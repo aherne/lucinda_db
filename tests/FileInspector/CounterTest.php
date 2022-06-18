@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\DB\FileInspector;
 
 use Lucinda\DB\FileInspector\Counter;
@@ -8,7 +9,7 @@ use Lucinda\UnitTest\Result;
 class CounterTest
 {
     private $inspector;
-    
+
     public function __construct()
     {
         $this->inspector = new Counter();
@@ -27,7 +28,7 @@ class CounterTest
         }
         return new Result(true);
     }
-        
+
 
     public function getValue()
     {

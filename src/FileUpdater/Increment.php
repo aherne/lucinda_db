@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB\FileUpdater;
 
 use Lucinda\DB\FileUpdater;
@@ -8,24 +9,22 @@ use Lucinda\DB\FileUpdater;
  */
 class Increment implements FileUpdater
 {
-    private string $key;
     private int $step;
     private int $value;
-    
+
     /**
      * Constructs by entry key
      *
-     * @param string $key Key of entry in database
      * @param int $step Step of incrementation
      */
-    public function __construct(string $key, int $step = 1)
+    public function __construct(int $step = 1)
     {
-        $this->key = $key;
         $this->step = $step;
     }
-    
+
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\DB\FileUpdater::update()
      */
     public function update(mixed &$json): bool
@@ -34,7 +33,7 @@ class Increment implements FileUpdater
         $this->value = $json;
         return true;
     }
-    
+
     /**
      * Gets incremented value
      *

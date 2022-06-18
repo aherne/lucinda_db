@@ -1,22 +1,26 @@
 <?php
+
 namespace Lucinda\DB;
 
 use Lucinda\DB\FileDeleter\All as DeleteAll;
 
 class SchemaDriver implements SchemaOperations
 {
+    /**
+     * @var string[]
+     */
     private array $schemas = [];
-    
+
     /**
      * Sets up database entry to query based on Configuration object and tags key is composed of
      *
-     * @param array $schemas
+     * @param string[] $schemas
      */
     public function __construct(array $schemas)
     {
         $this->schemas = $schemas;
     }
-        
+
     /**
      * Creates schemas on disk
      */
@@ -33,7 +37,7 @@ class SchemaDriver implements SchemaOperations
         }
         return $result;
     }
-    
+
     /**
      * Checks if schemas exists and it is writable
      *
@@ -49,7 +53,7 @@ class SchemaDriver implements SchemaOperations
         }
         return true;
     }
-    
+
     /**
      * Gets number of entries in schema
      *
@@ -60,7 +64,7 @@ class SchemaDriver implements SchemaOperations
         $schema = new Schema($this->schemas[rand(0, sizeof($this->schemas)-1)]);
         return $schema->getCapacity();
     }
-    
+
     /**
      * Gets all keys in schema sorted alphabetically
      *
@@ -71,11 +75,11 @@ class SchemaDriver implements SchemaOperations
         $schema = new Schema($this->schemas[rand(0, sizeof($this->schemas)-1)]);
         return $schema->getAll();
     }
-    
+
     /**
      * Gets all keys in schema matching tag sorted alphabetically
      *
-     * @param string $tag Tag name
+     * @param  string $tag Tag name
      * @return string[] List of keys found in schema
      */
     public function getByTag(string $tag): array
@@ -83,7 +87,7 @@ class SchemaDriver implements SchemaOperations
         $schema = new Schema($this->schemas[rand(0, sizeof($this->schemas)-1)]);
         return $schema->getByTag($tag);
     }
-    
+
     /**
      * Deletes all entries in schema
      *
@@ -94,7 +98,7 @@ class SchemaDriver implements SchemaOperations
         $folder = new Folder($this->schemas[rand(0, sizeof($this->schemas)-1)]);
         return $folder->clear(new DeleteAll($this->schemas));
     }
-    
+
     /**
      * Creates schema on disk
      *

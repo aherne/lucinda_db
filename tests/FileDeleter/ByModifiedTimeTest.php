@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\DB\FileDeleter;
 
 use Lucinda\DB\FileDeleter\ByModifiedTime;

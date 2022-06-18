@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\DB;
 
 use Lucinda\DB\DatabaseMaintenance;
@@ -11,11 +12,11 @@ use Lucinda\DB\SchemaStatus;
 class DatabaseMaintenanceTest
 {
     private $object;
-    
+
     public function __construct()
     {
         $this->object = new DatabaseMaintenance(__DIR__."/tests.xml", "local");
-        
+
         // create and fill database
         $entries = [
             ["tags"=>["a", "b"], "value"=>1, "date"=>"2018-01-02 01:02:03"],
@@ -40,8 +41,8 @@ class DatabaseMaintenanceTest
         $driver = new SchemaDriver($configuration->getSchemas());
         $driver->drop();
     }
-    
-    
+
+
     public function checkHealth()
     {
         return new Result($this->object->checkHealth(0.1)==["tests/myClient1"=>SchemaStatus::ONLINE, "tests/myClient2"=>SchemaStatus::ONLINE]);
@@ -50,66 +51,66 @@ class DatabaseMaintenanceTest
     public function plugIn()
     {
         $newSchema = "tests/myClient3";
-        
+
         mkdir($newSchema, 0777);
-        
+
         $this->object->plugIn($newSchema);
-        
+
         $output = [];
-        
+
         $object = new Schema($newSchema);
         $output[] = new Result($object->exists() && $object->getCapacity()==4, "added on disk");
-        
+
         $configuration = new Configuration(__DIR__."/tests.xml", "local");
         $output[] = new Result($configuration->getSchemas()==["tests/myClient1", "tests/myClient2", "tests/myClient3"], "added in XML");
-        
+
         return $output;
     }
-        
+
 
     public function plugOut()
     {
         $newSchema = "tests/myClient3";
         $this->object->plugOut($newSchema);
-        
+
         $output = [];
-        
+
         $object = new Schema($newSchema);
         $output[] = new Result($object->getCapacity()==0, "removed from disk");
-        
+
         $configuration = new Configuration(__DIR__."/tests.xml", "local");
         $output[] = new Result($configuration->getSchemas()==["tests/myClient1", "tests/myClient2"], "removed from XML");
-        
+
         rmdir($newSchema);
-        
+
         return $output;
     }
-        
+
 
     public function deleteByTag()
     {
         $this->object->deleteByTag("a");
-        
+
         $configuration = new Configuration(__DIR__."/tests.xml", "local");
         $driver = new SchemaDriver($configuration->getSchemas());
         return new Result($driver->getAll()==["b_c.json", "c_d.json", "d_e.json"]);
     }
-        
+
 
     public function deleteUntil()
     {
         $this->object->deleteUntil(time()-strtotime("2018-02-04 04:05:06"));
-        
+
         $configuration = new Configuration(__DIR__."/tests.xml", "local");
         $driver = new SchemaDriver($configuration->getSchemas());
         return new Result($driver->getAll()==["c_d.json", "d_e.json"]);
     }
-        
+
 
     public function deleteByCapacity()
     {
         $this->object->deleteByCapacity(1, 2);
-        
+
         $configuration = new Configuration(__DIR__."/tests.xml", "local");
         $driver = new SchemaDriver($configuration->getSchemas());
         return new Result($driver->getAll()==["d_e.json"]);

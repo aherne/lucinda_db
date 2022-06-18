@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB;
 
 /**
@@ -6,20 +7,23 @@ namespace Lucinda\DB;
  */
 class ValueDriver implements ValueOperations
 {
+    /**
+     * @var string[]
+     */
     private array $schemas = [];
     private string $key;
 
     /**
      * Sets up database entry to query based on Configuration object and tags key is composed of
      *
-     * @param array $schemas List of schemas value is stored into
-     * @param array $tags List of tags key is composed of
+     * @param  string[] $schemas List of schemas value is stored into
+     * @param  string[] $tags    List of tags key is composed of
      * @throws KeyException
      */
     public function __construct(array $schemas, array $tags)
     {
         $this->schemas = $schemas;
-        
+
         $object = new Key($tags);
         $this->key = $object->getValue();
     }
@@ -27,7 +31,7 @@ class ValueDriver implements ValueOperations
     /**
      * Sets entry value
      *
-     * @param mixed $value
+     * @param  mixed $value
      * @throws \JsonException
      */
     public function set(mixed $value): void
@@ -50,7 +54,7 @@ class ValueDriver implements ValueOperations
         $object = new Value($this->schemas[rand(0, sizeof($this->schemas)-1)], $this->key);
         return $object->get();
     }
-    
+
     /**
      * Checks if entry exists
      *
@@ -65,7 +69,7 @@ class ValueDriver implements ValueOperations
     /**
      * Increments existing entry and returns value
      *
-     * @param int $step Step of incrementation
+     * @param  int $step Step of incrementation
      * @return int
      * @throws \JsonException
      * @throws KeyNotFoundException If entry doesn't exist
@@ -88,7 +92,7 @@ class ValueDriver implements ValueOperations
     /**
      * Decrements existing entry and returns value
      *
-     * @param int $step Step of decrementation
+     * @param  int $step Step of decrementation
      * @return int
      * @throws \JsonException
      * @throws KeyNotFoundException If entry doesn't exist
@@ -107,7 +111,7 @@ class ValueDriver implements ValueOperations
         }
         return $value;
     }
-    
+
     /**
      * Deletes existing entry
      *

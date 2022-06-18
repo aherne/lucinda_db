@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\DB\FileUpdater;
 
 use Lucinda\DB\FileUpdater\IndexDeleter;

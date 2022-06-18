@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB\FileDeleter;
 
 use Lucinda\DB\FileDeleter;
@@ -9,22 +10,26 @@ use Lucinda\DB\FileDeleter;
 class ByModifiedTime implements FileDeleter
 {
     private int $modifiedTime;
+    /**
+     * @var string[]
+     */
     private array $replicas = [];
-    
+
     /**
      * Constructs by user-specified minimum last modified time
      *
-     * @param int $modifiedTime
-     * @param array $replicas
+     * @param int      $modifiedTime
+     * @param string[] $replicas
      */
     public function __construct(int $modifiedTime, array $replicas)
     {
         $this->modifiedTime = $modifiedTime;
         $this->replicas = $replicas;
     }
-    
+
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\DB\FileDeleter::delete()
      */
     public function delete(string $folder, string $file): bool

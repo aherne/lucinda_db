@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB;
 
 /**
@@ -7,7 +8,7 @@ namespace Lucinda\DB;
 class File
 {
     private string $path;
-    
+
     /**
      * Constructs file by absolute path.
      *
@@ -17,18 +18,18 @@ class File
     {
         $this->path = $path;
     }
-    
+
     /**
      * Writes file to disk
      *
-     * @param mixed $value Value to save as JSON
+     * @param  mixed $value Value to save as JSON
      * @throws \JsonException If value could not be encoded
      */
     public function write(mixed $value): void
     {
         file_put_contents($this->path, json_encode($value, JSON_THROW_ON_ERROR));
     }
-    
+
     /**
      * Checks if file exists
      *
@@ -49,13 +50,14 @@ class File
     {
         return json_decode(file_get_contents($this->path), true, 512, JSON_THROW_ON_ERROR);
     }
-    
+
     /**
      * Updates value in file by callback using exclusive lock to insure writes synchronization
      *
-     * WARNING: this operation is protected by a mutex, but in order to to prevent deadlocks it doesn't wait if mutex could not be acquired
+     * WARNING: this operation is protected by a mutex, but in order to to prevent deadlocks it doesn't wait
+     * if mutex could not be acquired
      *
-     * @param FileUpdater $callback Encapsulates algorithm of file value update
+     * @param  FileUpdater $callback Encapsulates algorithm of file value update
      * @throws \JsonException If value could not be decoded
      * @throws LockException If mutex could not be acquired.
      */
@@ -86,7 +88,7 @@ class File
             fclose($handle);
         }
     }
-    
+
     /**
      * Deletes file from disk
      */

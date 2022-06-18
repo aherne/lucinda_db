@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB\FileInspector;
 
 use Lucinda\DB\FileInspector;
@@ -8,10 +9,14 @@ use Lucinda\DB\FileInspector;
  */
 class All implements FileInspector
 {
+    /**
+     * @var string[]
+     */
     private array $entries = [];
-    
+
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\DB\FileInspector::inspect()
      */
     public function inspect(string $folder, string $file): void
@@ -20,11 +25,11 @@ class All implements FileInspector
             $this->entries[] = $file;
         }
     }
-    
+
     /**
      * Gets all entries found in schema
      *
-     * @return array
+     * @return string[]
      */
     public function getEntries(): array
     {

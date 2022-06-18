@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB\FileDeleter;
 
 /**
@@ -9,14 +10,17 @@ class CapacityHeap extends \SplMaxHeap
     protected int $minCapacity;
     protected int $maxCapacity;
     protected int $totalDeleted = 0;
+    /**
+     * @var string[]
+     */
     private array $schemas = [];
-    
+
     /**
      * Constructs by user-specified maximum/minimum database entry capacity
      *
-     * @param array $schemas Replicas on whom database is distributed
-     * @param int $minCapacity Number of entries allowed to remain if database reached max capacity.
-     * @param int $maxCapacity Maximum number of entries allowed to exist in database.
+     * @param string[] $schemas     Replicas on whom database is distributed
+     * @param int      $minCapacity Number of entries allowed to remain if database reached max capacity.
+     * @param int      $maxCapacity Maximum number of entries allowed to exist in database.
      */
     public function __construct(array $schemas, int $minCapacity, int $maxCapacity)
     {
@@ -24,16 +28,17 @@ class CapacityHeap extends \SplMaxHeap
         $this->minCapacity = $minCapacity;
         $this->maxCapacity = $maxCapacity;
     }
-        
+
     /**
      * {@inheritDoc}
+     *
      * @see \SplMaxHeap::compare()
      */
     protected function compare(mixed $value1, mixed $value2): int
     {
         return $value2["date"]-$value1["date"];
     }
-    
+
     /**
      * Push file to queue
      *
@@ -41,8 +46,9 @@ class CapacityHeap extends \SplMaxHeap
      */
     public function push(string $filePath): void
     {
-        $this->insert(["file"=>$filePath, "date"=>filemtime($this->schemas[rand(0, sizeof($this->schemas)-1)]."/".$filePath)]);
-        
+        $randomSchema = $this->schemas[rand(0, sizeof($this->schemas)-1)];
+        $this->insert(["file"=>$filePath, "date"=>filemtime($randomSchema."/".$filePath)]);
+
         // reduce size
         $elementsCount = $this->count();
         if ($elementsCount == $this->maxCapacity) {
@@ -53,7 +59,7 @@ class CapacityHeap extends \SplMaxHeap
             }
         }
     }
-    
+
     /**
      * Pops file from queue and deletes it from disk
      */
@@ -65,7 +71,7 @@ class CapacityHeap extends \SplMaxHeap
         }
         $this->totalDeleted++;
     }
-    
+
     /**
      * Gets total number of files deleted
      *

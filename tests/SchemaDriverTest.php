@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\DB;
 
 use Lucinda\DB\SchemaDriver;
@@ -9,7 +10,7 @@ class SchemaDriverTest
 {
     private $configuration;
     private $object;
-    
+
     public function __construct()
     {
         $this->configuration = new Configuration(__DIR__."/tests.xml", "local");
@@ -20,13 +21,13 @@ class SchemaDriverTest
     {
         return new Result($this->object->create());
     }
-        
+
 
     public function exists()
     {
         return new Result($this->object->exists());
     }
-        
+
 
     public function getCapacity()
     {
@@ -43,25 +44,25 @@ class SchemaDriverTest
         }
         return new Result($this->object->getCapacity()==2);
     }
-        
+
 
     public function getAll()
     {
         return new Result($this->object->getAll()==["a_b.json", "b_c.json"]);
     }
-        
+
 
     public function getByTag()
     {
         return new Result($this->object->getByTag("c")==["b_c.json"]);
     }
-        
+
 
     public function deleteAll()
     {
         return new Result($this->object->deleteAll()==2);
     }
-        
+
 
     public function drop()
     {

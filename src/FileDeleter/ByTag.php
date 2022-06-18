@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB\FileDeleter;
 
 use Lucinda\DB\FileDeleter;
@@ -9,22 +10,26 @@ use Lucinda\DB\FileDeleter;
 class ByTag implements FileDeleter
 {
     private string $tag;
+    /**
+     * @var string[]
+     */
     private array $replicas = [];
-    
+
     /**
      * Constructs by tag to match
      *
-     * @param string $tag Name of tag to match
-     * @param array $replicas Replicas on whom database is distributed
+     * @param string   $tag      Name of tag to match
+     * @param string[] $replicas Replicas on whom database is distributed
      */
     public function __construct(string $tag, array $replicas = [])
     {
         $this->tag = $tag;
         $this->replicas = $replicas;
     }
-    
+
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\DB\FileDeleter::delete()
      */
     public function delete(string $folder, string $file): bool

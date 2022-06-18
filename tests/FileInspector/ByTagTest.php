@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\DB\FileInspector;
 
 use Lucinda\DB\FileInspector\ByTag;
@@ -8,12 +9,12 @@ use Lucinda\UnitTest\Result;
 class ByTagTest
 {
     private $inspector;
-    
+
     public function __construct()
     {
         $this->inspector = new ByTag("a");
     }
-    
+
     public function inspect()
     {
         $schema = dirname(__DIR__)."/DB";
@@ -27,8 +28,8 @@ class ByTagTest
         }
         return new Result(true);
     }
-    
-    
+
+
     public function getEntries()
     {
         return new Result($this->inspector->getEntries()==["a_b.json"]);

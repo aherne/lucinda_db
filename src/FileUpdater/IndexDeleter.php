@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\DB\FileUpdater;
 
 use Lucinda\DB\FileUpdater;
@@ -9,7 +10,7 @@ use Lucinda\DB\FileUpdater;
 class IndexDeleter implements FileUpdater
 {
     private string $key;
-    
+
     /**
      * Constructs by entry key
      *
@@ -19,9 +20,10 @@ class IndexDeleter implements FileUpdater
     {
         $this->key = $key;
     }
-    
+
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\DB\FileUpdater::update()
      */
     public function update(&$json): bool
