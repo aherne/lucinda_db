@@ -5,7 +5,7 @@ namespace Lucinda\DB;
 /**
  * Encapsulates key in KV store based on composing tags
  */
-class Key
+final class Key
 {
     private string $value;
 

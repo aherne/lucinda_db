@@ -5,7 +5,7 @@ namespace Lucinda\DB;
 /**
  * Encapsulates a folder and its operations
  */
-class Folder
+final class Folder
 {
     private string $path;
 

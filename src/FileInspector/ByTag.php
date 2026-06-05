@@ -7,7 +7,7 @@ use Lucinda\DB\FileInspector;
 /**
  * Encapsulates a inspector that selects all entries in schema by tag
  */
-class ByTag implements FileInspector
+final class ByTag implements FileInspector
 {
     private string $tag;
     /**

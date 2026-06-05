@@ -7,7 +7,7 @@ use Lucinda\DB\FileInspector;
 /**
  * Encapsulates an importer that populates a schema based on an existing one
  */
-class Importer implements FileInspector
+final class Importer implements FileInspector
 {
     private string $destinationSchema;
 

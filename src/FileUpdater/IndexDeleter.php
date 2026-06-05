@@ -7,7 +7,7 @@ use Lucinda\DB\FileUpdater;
 /**
  * Encapsulates a deleter of an index entry
  */
-class IndexDeleter implements FileUpdater
+final class IndexDeleter implements FileUpdater
 {
     private string $key;
 

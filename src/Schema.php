@@ -12,7 +12,7 @@ use Lucinda\DB\FileInspector\Importer;
 /**
  * Encapsulates operations on a LucindaDB folder schema [4,294,967,295]
  */
-class Schema implements SchemaOperations
+final class Schema implements SchemaOperations
 {
     private string $path;
 

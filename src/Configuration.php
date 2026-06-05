@@ -5,7 +5,7 @@ namespace Lucinda\DB;
 /**
  * Encapsulates LucindaDB database configuration by XML "ldb" tag and development environment
  */
-class Configuration
+final class Configuration
 {
     private string $xmlFilePath;
     private string $developmentEnvironment;

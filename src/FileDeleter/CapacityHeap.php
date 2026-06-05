@@ -5,7 +5,7 @@ namespace Lucinda\DB\FileDeleter;
 /**
  * Encapsulates a queue of files sorted by modification time that shrinks to min capacity when max capacity is reached.
  */
-class CapacityHeap extends \SplMaxHeap
+final class CapacityHeap extends \SplMaxHeap
 {
     protected int $minCapacity;
     protected int $maxCapacity;

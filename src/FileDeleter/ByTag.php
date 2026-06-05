@@ -7,7 +7,7 @@ use Lucinda\DB\FileDeleter;
 /**
  * Encapsulates a deleter that clears database of all entries whose key includes tag
  */
-class ByTag implements FileDeleter
+final class ByTag implements FileDeleter
 {
     private string $tag;
     /**

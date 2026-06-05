@@ -7,7 +7,7 @@ use Lucinda\DB\FileDeleter;
 /**
  * Encapsulates a deleter that clears database of all entries
  */
-class All implements FileDeleter
+final class All implements FileDeleter
 {
     /**
      * @var string[]

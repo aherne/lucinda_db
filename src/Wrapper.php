@@ -5,7 +5,7 @@ namespace Lucinda\DB;
 /**
  * Encapsulates operations with LucindaDB entries
  */
-class Wrapper
+final class Wrapper
 {
     private Configuration $configuration;
 

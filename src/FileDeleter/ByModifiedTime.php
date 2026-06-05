@@ -7,7 +7,7 @@ use Lucinda\DB\FileDeleter;
 /**
  * Encapsulates a deleter that clears database of all entries older than a last modified time
  */
-class ByModifiedTime implements FileDeleter
+final class ByModifiedTime implements FileDeleter
 {
     private int $modifiedTime;
     /**

@@ -7,7 +7,7 @@ use Lucinda\DB\FileUpdater;
 /**
  * Encapsulates an updater that decrements existing entry value (assuming by default it's integer)
  */
-class Decrement implements FileUpdater
+final class Decrement implements FileUpdater
 {
     private int $step;
     private int $value;

@@ -5,7 +5,7 @@ namespace Lucinda\DB;
 /**
  * Encapsulates a json file and its operations
  */
-class File
+final class File
 {
     private string $path;
     private string $lockPath;

@@ -7,7 +7,7 @@ use Lucinda\DB\FileUpdater;
 /**
  * Encapsulates a setter of an index entry
  */
-class IndexSaver implements FileUpdater
+final class IndexSaver implements FileUpdater
 {
     private string $schema;
     private string $key;

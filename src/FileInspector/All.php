@@ -7,7 +7,7 @@ use Lucinda\DB\FileInspector;
 /**
  * Encapsulates a inspector that selects all entries in schema
  */
-class All implements FileInspector
+final class All implements FileInspector
 {
     /**
      * @var string[]

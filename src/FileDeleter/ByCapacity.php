@@ -7,7 +7,7 @@ use Lucinda\DB\FileDeleter;
 /**
  * Encapsulates a deleter that clears database of all older entries past a max capacity
  */
-class ByCapacity implements FileDeleter
+final class ByCapacity implements FileDeleter
 {
     private CapacityHeap $capacityHeap;
 

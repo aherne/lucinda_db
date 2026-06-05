@@ -5,7 +5,7 @@ namespace Lucinda\DB;
 /**
  * Wrapper of Value for data distribution, allowing traffic leveraging on multiple disks
  */
-class ValueDriver implements ValueOperations
+final class ValueDriver implements ValueOperations
 {
     /**
      * @var string[]

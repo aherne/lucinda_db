@@ -7,7 +7,7 @@ use Lucinda\DB\FileInspector;
 /**
  * Encapsulates a inspector that just iterates and counts database entries found in schema
  */
-class Counter implements FileInspector
+final class Counter implements FileInspector
 {
     private int $total = 0;
 

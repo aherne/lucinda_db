@@ -13,7 +13,7 @@ use Lucinda\DB\FileDeleter\ByCapacity as DeleteByCapacity;
  * - plugging out schemas based on plugout log
  * - reducing size based on various algorithms
  */
-class DatabaseMaintenance
+final class DatabaseMaintenance
 {
     private Configuration $configuration;
 

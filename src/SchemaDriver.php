@@ -4,7 +4,7 @@ namespace Lucinda\DB;
 
 use Lucinda\DB\FileDeleter\All as DeleteAll;
 
-class SchemaDriver implements SchemaOperations
+final class SchemaDriver implements SchemaOperations
 {
     /**
      * @var string[]
