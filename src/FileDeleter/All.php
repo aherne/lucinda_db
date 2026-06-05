@@ -34,14 +34,29 @@ class All implements FileDeleter
         if (!in_array($file, [".", ".."])) {
             if ($this->replicas) {
                 foreach ($this->replicas as $schema) {
-                    unlink($schema."/".$file);
+                    $this->unlinkEntry($schema."/".$file);
                 }
             } else {
-                unlink($folder."/".$file);
+                $this->unlinkEntry($folder."/".$file);
             }
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Deletes entry and sibling lock if found.
+     *
+     * @param string $path
+     */
+    private function unlinkEntry(string $path): void
+    {
+        if (file_exists($path)) {
+            unlink($path);
+        }
+        if (file_exists($path.".lock")) {
+            unlink($path.".lock");
         }
     }
 }

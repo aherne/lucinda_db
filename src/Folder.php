@@ -59,7 +59,9 @@ class Folder
     {
         $handle = opendir($this->path);
         while (($file = readdir($handle)) !== false) {
-            $inspector->inspect($this->path, $file);
+            if ($this->isEntryFile($file)) {
+                $inspector->inspect($this->path, $file);
+            }
         }
         closedir($handle);
     }
@@ -75,7 +77,7 @@ class Folder
         $result = 0;
         $handle = opendir($this->path);
         while (($file = readdir($handle)) !== false) {
-            if ($deleter->delete($this->path, $file)) {
+            if ($this->isEntryFile($file) && $deleter->delete($this->path, $file)) {
                 $result++;
             }
         }
@@ -88,6 +90,24 @@ class Folder
      */
     public function delete(): void
     {
+        $handle = opendir($this->path);
+        while (($file = readdir($handle)) !== false) {
+            if (!in_array($file, [".", ".."]) && is_file($this->path."/".$file)) {
+                unlink($this->path."/".$file);
+            }
+        }
+        closedir($handle);
         rmdir($this->path);
+    }
+
+    /**
+     * Checks if a file is a database entry.
+     *
+     * @param string $file
+     * @return bool
+     */
+    private function isEntryFile(string $file): bool
+    {
+        return !in_array($file, [".", ".."]) && str_ends_with($file, ".json");
     }
 }

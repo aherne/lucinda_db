@@ -4,10 +4,10 @@ namespace Test\Lucinda\DB\FileDeleter;
 
 use Lucinda\DB\Value;
 use Lucinda\DB\FileDeleter\CapacityHeap;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 use Lucinda\DB\Key;
 
-class CapacityHeapTest
+class CapacityHeapTest extends TestCase
 {
     private $object;
     private $schema;
@@ -49,12 +49,12 @@ class CapacityHeapTest
         $this->object->push("b_c.json");
         $this->object->push("c_d.json");
         $this->object->push("d_e.json");
-        return new Result(true);
+        return $this->assertEquals(2, $this->object->getTotalDeleted());
     }
 
 
     public function getTotalDeleted()
     {
-        return new Result($this->object->getTotalDeleted()==2);
+        return $this->assertEquals(2, $this->object->getTotalDeleted());
     }
 }

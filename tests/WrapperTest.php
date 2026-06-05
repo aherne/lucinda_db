@@ -4,10 +4,10 @@ namespace Test\Lucinda\DB;
 
 use Lucinda\DB\Wrapper;
 use Lucinda\DB\ValueDriver;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 use Lucinda\DB\SchemaDriver;
 
-class WrapperTest
+class WrapperTest extends TestCase
 {
     private $object;
 
@@ -18,11 +18,11 @@ class WrapperTest
 
     public function getEntryDriver()
     {
-        return new Result($this->object->getEntryDriver(["a","b"]) instanceof ValueDriver);
+        return $this->assertInstanceOf(ValueDriver::class, $this->object->getEntryDriver(["a","b"]));
     }
 
     public function getSchemaDriver()
     {
-        return new Result($this->object->getSchemaDriver() instanceof SchemaDriver);
+        return $this->assertInstanceOf(SchemaDriver::class, $this->object->getSchemaDriver());
     }
 }

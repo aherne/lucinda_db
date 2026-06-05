@@ -5,9 +5,9 @@ namespace Test\Lucinda\DB\FileDeleter;
 use Lucinda\DB\FileDeleter\ByCapacity;
 use Lucinda\DB\Key;
 use Lucinda\DB\Value;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 
-class ByCapacityTest
+class ByCapacityTest extends TestCase
 {
     private $object;
     private $schema;
@@ -48,11 +48,11 @@ class ByCapacityTest
         $this->object->delete($this->schema, "b_c.json");
         $this->object->delete($this->schema, "c_d.json");
         $this->object->delete($this->schema, "d_e.json");
-        return new Result(true);
+        return $this->assertEquals(2, $this->object->getTotal());
     }
 
     public function getTotal()
     {
-        return new Result($this->object->getTotal()==2);
+        return $this->assertEquals(2, $this->object->getTotal());
     }
 }

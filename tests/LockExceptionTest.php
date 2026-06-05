@@ -2,6 +2,6 @@
 
 namespace Test\Lucinda\DB;
 
-class LockExceptionTest
+class LockExceptionTest extends TestCase
 {
 }

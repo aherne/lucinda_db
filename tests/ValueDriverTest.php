@@ -2,11 +2,11 @@
 
 namespace Test\Lucinda\DB;
 
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 use Lucinda\DB\Configuration;
 use Lucinda\DB\ValueDriver;
 
-class ValueDriverTest
+class ValueDriverTest extends TestCase
 {
     private $object;
 
@@ -28,51 +28,74 @@ class ValueDriverTest
 
     public function set()
     {
-        $output = [];
         $this->object->set(1);
-        $output[] = new Result($this->test('myClient1', 1) && $this->test('myClient2', 1));
-        return $output;
+        return [
+            $this->assertEquals(1, $this->readValue('myClient1')),
+            $this->assertEquals(1, $this->readValue('myClient2'))
+        ];
     }
 
 
     public function get()
     {
-        return new Result($this->object->get()==1);
+        return $this->assertEquals(1, $this->object->get());
+    }
+
+    public function getRepairsCorruptedReplica()
+    {
+        $this->object->set(1);
+        file_put_contents(__DIR__."/myClient1/a_b.json", "{");
+        $value = $this->object->get();
+        $repaired = json_decode(file_get_contents(__DIR__."/myClient1/a_b.json"), true);
+        $this->object->delete();
+        return [
+            $this->assertEquals(1, $value),
+            $this->assertEquals(1, $repaired)
+        ];
     }
 
 
     public function exists()
     {
-        return new Result($this->object->exists());
+        return $this->assertTrue($this->object->exists());
     }
 
 
     public function increment()
     {
-        return new Result($this->object->increment()==2 && $this->object->get()==2);
+        return [
+            $this->assertEquals(2, $this->object->increment()),
+            $this->assertEquals(2, $this->object->get())
+        ];
     }
 
 
     public function decrement()
     {
-        return new Result($this->object->decrement()==1 && $this->object->get()==1);
+        return [
+            $this->assertEquals(1, $this->object->decrement()),
+            $this->assertEquals(1, $this->object->get())
+        ];
     }
 
 
     public function delete()
     {
         $this->object->delete();
-        return new Result(!$this->object->exists() && !$this->test('myClient1', 1) && !$this->test('myClient2', 1));
+        return [
+            $this->assertFalse($this->object->exists()),
+            $this->assertFileNotExists(__DIR__."/myClient1/a_b.json"),
+            $this->assertFileNotExists(__DIR__."/myClient2/a_b.json")
+        ];
     }
 
-    private function test(string $folder, $value): bool
+    private function readValue(string $folder): mixed
     {
         $filename = __DIR__."/".$folder."/a_b.json";
         if (!file_exists($filename)) {
-            return false;
+            return null;
         }
 
-        $content = json_decode(file_get_contents($filename), true);
-        return $content == $value;
+        return json_decode(file_get_contents($filename), true);
     }
 }

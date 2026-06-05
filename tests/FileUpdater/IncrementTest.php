@@ -3,9 +3,9 @@
 namespace Test\Lucinda\DB\FileUpdater;
 
 use Lucinda\DB\FileUpdater\Increment;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 
-class IncrementTest
+class IncrementTest extends TestCase
 {
     private $object;
     private $value = 1;
@@ -17,12 +17,12 @@ class IncrementTest
 
     public function update()
     {
-        return new Result($this->object->update($this->value));
+        return $this->assertTrue($this->object->update($this->value));
     }
 
 
     public function getValue()
     {
-        return new Result($this->object->getValue()==2);
+        return $this->assertEquals(2, $this->object->getValue());
     }
 }

@@ -3,14 +3,14 @@
 namespace Test\Lucinda\DB;
 
 use Lucinda\DB\Configuration;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 
-class ConfigurationTest
+class ConfigurationTest extends TestCase
 {
     public function getSchemas()
     {
         $object = new Configuration(__DIR__."/tests.xml", "local");
-        return new Result($object->getSchemas() == ["tests/myClient1", "tests/myClient2"]);
+        return $this->assertEquals(["tests/myClient1", "tests/myClient2"], $object->getSchemas());
     }
 
 
@@ -19,7 +19,7 @@ class ConfigurationTest
         $object1 = new Configuration(__DIR__."/tests.xml", "local");
         $object1->addSchema("tests/myClient3");
         $object2 = new Configuration(__DIR__."/tests.xml", "local");
-        return new Result($object2->getSchemas() == ["tests/myClient1", "tests/myClient2", "tests/myClient3"]);
+        return $this->assertEquals(["tests/myClient1", "tests/myClient2", "tests/myClient3"], $object2->getSchemas());
     }
 
 
@@ -28,6 +28,6 @@ class ConfigurationTest
         $object1 = new Configuration(__DIR__."/tests.xml", "local");
         $object1->removeSchema("tests/myClient3");
         $object2 = new Configuration(__DIR__."/tests.xml", "local");
-        return new Result($object2->getSchemas() == ["tests/myClient1", "tests/myClient2"]);
+        return $this->assertEquals(["tests/myClient1", "tests/myClient2"], $object2->getSchemas());
     }
 }

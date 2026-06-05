@@ -3,10 +3,10 @@
 namespace Test\Lucinda\DB;
 
 use Lucinda\DB\File;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 use Lucinda\DB\FileUpdater;
 
-class FileTest
+class FileTest extends TestCase
 {
     private $object;
 
@@ -31,18 +31,18 @@ class FileTest
     public function write()
     {
         $this->object->write(["abc"=>"def"]);
-        return new Result(true);
+        return $this->assertTrue($this->object->exists());
     }
 
     public function exists()
     {
-        return new Result($this->object->exists());
+        return $this->assertTrue($this->object->exists());
     }
 
 
     public function read()
     {
-        return new Result($this->object->read()==["abc"=>"def"]);
+        return $this->assertEquals(["abc"=>"def"], $this->object->read());
     }
 
 
@@ -57,13 +57,16 @@ class FileTest
                 }
             }
         );
-        return new Result($this->object->read()==["abc"=>"qwe"]);
+        return $this->assertEquals(["abc"=>"qwe"], $this->object->read());
     }
 
 
     public function delete()
     {
         $this->object->delete();
-        return new Result(!$this->object->exists());
+        return [
+            $this->assertFalse($this->object->exists()),
+            $this->assertFileNotExists(__DIR__."/DB/x_y.json.lock")
+        ];
     }
 }

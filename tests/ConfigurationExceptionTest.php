@@ -2,6 +2,6 @@
 
 namespace Test\Lucinda\DB;
 
-class ConfigurationExceptionTest
+class ConfigurationExceptionTest extends TestCase
 {
 }

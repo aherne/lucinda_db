@@ -3,11 +3,11 @@
 namespace Test\Lucinda\DB;
 
 use Lucinda\DB\Schema;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 use Lucinda\DB\Value;
 use Lucinda\DB\Key;
 
-class SchemaTest
+class SchemaTest extends TestCase
 {
     private $schema;
     private $object;
@@ -21,12 +21,12 @@ class SchemaTest
 
     public function create()
     {
-        return new Result($this->object->create());
+        return $this->assertTrue($this->object->create());
     }
 
     public function exists()
     {
-        return new Result($this->object->exists());
+        return $this->assertTrue($this->object->exists());
     }
 
 
@@ -42,24 +42,24 @@ class SchemaTest
             $object = new Value($this->schema, $key->getValue());
             $object->set($info["value"]);
         }
-        return new Result($this->object->getCapacity()==3);
+        return $this->assertEquals(3, $this->object->getCapacity());
     }
 
 
     public function getAll()
     {
-        return new Result($this->object->getAll()==["a_b.json", "b_c.json", "c_d.json"]);
+        return $this->assertEquals(["a_b.json", "b_c.json", "c_d.json"], $this->object->getAll());
     }
 
 
     public function getByTag()
     {
-        return new Result($this->object->getByTag("b")==["a_b.json", "b_c.json"]);
+        return $this->assertEquals(["a_b.json", "b_c.json"], $this->object->getByTag("b"));
     }
 
     public function deleteAll()
     {
-        return new Result($this->object->deleteAll()==3);
+        return $this->assertEquals(3, $this->object->deleteAll());
     }
 
     public function populate()
@@ -90,12 +90,12 @@ class SchemaTest
         }
         rmdir($schema);
 
-        return new Result($this->object->getCapacity()==3);
+        return $this->assertEquals(3, $this->object->getCapacity());
     }
 
     public function drop()
     {
         $this->object->drop();
-        return new Result(!$this->object->exists());
+        return $this->assertFalse($this->object->exists());
     }
 }

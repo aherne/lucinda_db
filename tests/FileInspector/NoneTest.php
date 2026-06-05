@@ -2,12 +2,12 @@
 
 namespace Test\Lucinda\DB\FileDeleter;
 
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 use Lucinda\DB\Value;
 use Lucinda\DB\Key;
 use Lucinda\DB\FileInspector\Counter;
 
-class NoneTest
+class NoneTest extends TestCase
 {
     public function delete()
     {
@@ -20,6 +20,6 @@ class NoneTest
             $object = new Key($info["tags"]);
             $inspector->inspect($schema, $object->getValue().".json");
         }
-        return new Result($object->getValue()==1);
+        return $this->assertEquals(1, $object->getValue());
     }
 }

@@ -51,8 +51,23 @@ class ValueDriver implements ValueOperations
      */
     public function get(): mixed
     {
-        $object = new Value($this->schemas[rand(0, sizeof($this->schemas)-1)], $this->key);
-        return $object->get();
+        $lastException = null;
+        foreach ($this->getShuffledSchemas() as $schema) {
+            $object = new Value($schema, $this->key);
+            try {
+                $value = $object->get();
+                $this->repairReplicas($value);
+                return $value;
+            } catch (KeyNotFoundException | \JsonException $exception) {
+                $lastException = $exception;
+            }
+        }
+
+        if ($lastException instanceof \JsonException) {
+            throw $lastException;
+        }
+
+        throw new KeyNotFoundException($this->key);
     }
 
     /**
@@ -62,8 +77,13 @@ class ValueDriver implements ValueOperations
      */
     public function exists(): bool
     {
-        $object = new Value($this->schemas[rand(0, sizeof($this->schemas)-1)], $this->key);
-        return $object->exists();
+        foreach ($this->schemas as $schema) {
+            $object = new Value($schema, $this->key);
+            if ($object->exists()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -119,9 +139,54 @@ class ValueDriver implements ValueOperations
      */
     public function delete(): void
     {
+        $found = false;
         foreach ($this->schemas as $schema) {
             $object = new Value($schema, $this->key);
-            $object->delete();
+            if ($object->exists()) {
+                $found = true;
+                $object->delete();
+            }
+        }
+
+        if (!$found) {
+            throw new KeyNotFoundException($this->key);
+        }
+    }
+
+    /**
+     * Gets schemas in randomized order.
+     *
+     * @return string[]
+     */
+    private function getShuffledSchemas(): array
+    {
+        $schemas = $this->schemas;
+        shuffle($schemas);
+        return $schemas;
+    }
+
+    /**
+     * Repairs missing or corrupted replicas after a successful read.
+     *
+     * @param mixed $value
+     */
+    private function repairReplicas(mixed $value): void
+    {
+        foreach ($this->schemas as $schema) {
+            $object = new Value($schema, $this->key);
+            try {
+                if (!$object->exists() || $object->get() !== $value) {
+                    $object->set($value);
+                }
+            } catch (KeyNotFoundException | \JsonException) {
+                try {
+                    $object->set($value);
+                } catch (\Throwable) {
+                    // A read from one healthy replica should not fail because another replica cannot be repaired.
+                }
+            } catch (\Throwable) {
+                // A read from one healthy replica should not fail because another replica cannot be repaired.
+            }
         }
     }
 }

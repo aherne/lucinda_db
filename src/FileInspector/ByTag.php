@@ -17,6 +17,7 @@ class ByTag implements FileInspector
 
     public function __construct(string $tag)
     {
+        new \Lucinda\DB\Key([$tag]);
         $this->tag = $tag;
     }
 
@@ -27,7 +28,7 @@ class ByTag implements FileInspector
      */
     public function inspect(string $folder, string $file): void
     {
-        if (preg_match("/(^|_)".$this->tag."(_|\.json)/", $file)==1) {
+        if (preg_match("/(^|_)".preg_quote($this->tag, "/")."(_|\.json)/", $file)==1) {
             $this->entries[] = $file;
         }
     }

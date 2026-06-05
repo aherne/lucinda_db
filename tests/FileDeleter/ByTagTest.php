@@ -4,10 +4,10 @@ namespace Test\Lucinda\DB\FileDeleter;
 
 use Lucinda\DB\Value;
 use Lucinda\DB\FileDeleter\ByTag;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 use Lucinda\DB\Key;
 
-class ByTagTest
+class ByTagTest extends TestCase
 {
     public function delete()
     {
@@ -23,7 +23,7 @@ class ByTagTest
             touch($schema."/".implode("_", $info["tags"]).".json", strtotime($info["date"]));
         }
         $object = new ByTag("a");
-        $result = new Result($object->delete($schema, "a_b.json"));
+        $result = $this->assertTrue($object->delete($schema, "a_b.json"));
         rmdir($schema);
         return $result;
     }

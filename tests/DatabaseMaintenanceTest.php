@@ -4,12 +4,12 @@ namespace Test\Lucinda\DB;
 
 use Lucinda\DB\DatabaseMaintenance;
 use Lucinda\DB\Configuration;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 use Lucinda\DB\Schema;
 use Lucinda\DB\SchemaDriver;
 use Lucinda\DB\SchemaStatus;
 
-class DatabaseMaintenanceTest
+class DatabaseMaintenanceTest extends TestCase
 {
     private $object;
 
@@ -45,7 +45,10 @@ class DatabaseMaintenanceTest
 
     public function checkHealth()
     {
-        return new Result($this->object->checkHealth(0.1)==["tests/myClient1"=>SchemaStatus::ONLINE, "tests/myClient2"=>SchemaStatus::ONLINE]);
+        return $this->assertEquals(
+            ["tests/myClient1"=>SchemaStatus::ONLINE, "tests/myClient2"=>SchemaStatus::ONLINE],
+            $this->object->checkHealth(0.1)
+        );
     }
 
     public function plugIn()
@@ -59,10 +62,15 @@ class DatabaseMaintenanceTest
         $output = [];
 
         $object = new Schema($newSchema);
-        $output[] = new Result($object->exists() && $object->getCapacity()==4, "added on disk");
+        $output[] = $this->assertTrue($object->exists(), "added on disk");
+        $output[] = $this->assertEquals(4, $object->getCapacity(), "imported capacity");
 
         $configuration = new Configuration(__DIR__."/tests.xml", "local");
-        $output[] = new Result($configuration->getSchemas()==["tests/myClient1", "tests/myClient2", "tests/myClient3"], "added in XML");
+        $output[] = $this->assertEquals(
+            ["tests/myClient1", "tests/myClient2", "tests/myClient3"],
+            $configuration->getSchemas(),
+            "added in XML"
+        );
 
         return $output;
     }
@@ -76,10 +84,10 @@ class DatabaseMaintenanceTest
         $output = [];
 
         $object = new Schema($newSchema);
-        $output[] = new Result($object->getCapacity()==0, "removed from disk");
+        $output[] = $this->assertEquals(0, $object->getCapacity(), "removed from disk");
 
         $configuration = new Configuration(__DIR__."/tests.xml", "local");
-        $output[] = new Result($configuration->getSchemas()==["tests/myClient1", "tests/myClient2"], "removed from XML");
+        $output[] = $this->assertEquals(["tests/myClient1", "tests/myClient2"], $configuration->getSchemas(), "removed from XML");
 
         rmdir($newSchema);
 
@@ -93,7 +101,7 @@ class DatabaseMaintenanceTest
 
         $configuration = new Configuration(__DIR__."/tests.xml", "local");
         $driver = new SchemaDriver($configuration->getSchemas());
-        return new Result($driver->getAll()==["b_c.json", "c_d.json", "d_e.json"]);
+        return $this->assertEquals(["b_c.json", "c_d.json", "d_e.json"], $driver->getAll());
     }
 
 
@@ -103,7 +111,7 @@ class DatabaseMaintenanceTest
 
         $configuration = new Configuration(__DIR__."/tests.xml", "local");
         $driver = new SchemaDriver($configuration->getSchemas());
-        return new Result($driver->getAll()==["c_d.json", "d_e.json"]);
+        return $this->assertEquals(["c_d.json", "d_e.json"], $driver->getAll());
     }
 
 
@@ -113,6 +121,6 @@ class DatabaseMaintenanceTest
 
         $configuration = new Configuration(__DIR__."/tests.xml", "local");
         $driver = new SchemaDriver($configuration->getSchemas());
-        return new Result($driver->getAll()==["d_e.json"]);
+        return $this->assertEquals(["d_e.json"], $driver->getAll());
     }
 }

@@ -4,9 +4,9 @@ namespace Test\Lucinda\DB\FileInspector;
 
 use Lucinda\DB\FileInspector\Counter;
 use Lucinda\DB\Key;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 
-class CounterTest
+class CounterTest extends TestCase
 {
     private $inspector;
 
@@ -26,12 +26,12 @@ class CounterTest
             $object = new Key($info);
             $this->inspector->inspect($schema, $object->getValue().".json");
         }
-        return new Result(true);
+        return $this->assertEquals(2, $this->inspector->getValue());
     }
 
 
     public function getValue()
     {
-        return new Result($this->inspector->getValue()==2);
+        return $this->assertEquals(2, $this->inspector->getValue());
     }
 }

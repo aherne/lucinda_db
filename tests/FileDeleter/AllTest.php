@@ -3,9 +3,9 @@
 namespace Test\Lucinda\DB\FileDeleter;
 
 use Lucinda\DB\FileDeleter\All;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 
-class AllTest
+class AllTest extends TestCase
 {
     public function delete()
     {
@@ -16,6 +16,6 @@ class AllTest
         $object = new All();
         $status = $object->delete($schema, $file);
         rmdir($schema);
-        return new Result($status);
+        return $this->assertTrue($status);
     }
 }

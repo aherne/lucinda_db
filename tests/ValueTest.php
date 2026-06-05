@@ -3,10 +3,10 @@
 namespace Test\Lucinda\DB;
 
 use Lucinda\DB\Value;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 use Lucinda\DB\Key;
 
-class ValueTest
+class ValueTest extends TestCase
 {
     private $object;
 
@@ -27,37 +27,37 @@ class ValueTest
     public function set()
     {
         $this->object->set(1);
-        return new Result(true);
+        return $this->assertTrue($this->object->exists());
     }
 
 
     public function get()
     {
-        return new Result($this->object->get()==1);
+        return $this->assertEquals(1, $this->object->get());
     }
 
 
     public function exists()
     {
-        return new Result($this->object->exists());
+        return $this->assertTrue($this->object->exists());
     }
 
 
     public function increment()
     {
-        return new Result($this->object->increment()==2);
+        return $this->assertEquals(2, $this->object->increment());
     }
 
 
     public function decrement()
     {
-        return new Result($this->object->decrement()==1);
+        return $this->assertEquals(1, $this->object->decrement());
     }
 
 
     public function delete()
     {
         $this->object->delete();
-        return new Result(!$this->object->exists());
+        return $this->assertFalse($this->object->exists());
     }
 }

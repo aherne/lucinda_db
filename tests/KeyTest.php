@@ -3,13 +3,13 @@
 namespace Test\Lucinda\DB;
 
 use Lucinda\DB\Key;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 
-class KeyTest
+class KeyTest extends TestCase
 {
     public function getValue()
     {
         $key = new Key(["r","b"]);
-        return new Result($key->getValue()=="b_r");
+        return $this->assertEquals("b_r", $key->getValue());
     }
 }

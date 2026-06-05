@@ -5,9 +5,9 @@ namespace Test\Lucinda\DB\FileDeleter;
 use Lucinda\DB\FileDeleter\ByModifiedTime;
 use Lucinda\DB\Key;
 use Lucinda\DB\Value;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 
-class ByModifiedTimeTest
+class ByModifiedTimeTest extends TestCase
 {
     public function delete()
     {
@@ -23,7 +23,7 @@ class ByModifiedTimeTest
             touch($schema."/".implode("_", $info["tags"]).".json", strtotime($info["date"]));
         }
         $object = new ByModifiedTime(strtotime("2018-01-23 10:11:22"), [$schema]);
-        $result = new Result($object->delete($schema, "a_b.json"));
+        $result = $this->assertTrue($object->delete($schema, "a_b.json"));
         rmdir($schema);
         return $result;
     }

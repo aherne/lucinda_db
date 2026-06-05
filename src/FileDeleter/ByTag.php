@@ -23,6 +23,7 @@ class ByTag implements FileDeleter
      */
     public function __construct(string $tag, array $replicas = [])
     {
+        new \Lucinda\DB\Key([$tag]);
         $this->tag = $tag;
         $this->replicas = $replicas;
     }
@@ -34,17 +35,32 @@ class ByTag implements FileDeleter
      */
     public function delete(string $folder, string $file): bool
     {
-        if (!in_array($file, [".", ".."]) && preg_match("/(^|_)".$this->tag."(_|\.json)/", $file)==1) {
+        if (!in_array($file, [".", ".."]) && preg_match("/(^|_)".preg_quote($this->tag, "/")."(_|\.json)/", $file)==1) {
             if ($this->replicas) {
                 foreach ($this->replicas as $schema) {
-                    unlink($schema."/".$file);
+                    $this->unlinkEntry($schema."/".$file);
                 }
             } else {
-                unlink($folder."/".$file);
+                $this->unlinkEntry($folder."/".$file);
             }
             return true;
         } else {
             return false;
+        }
+    }
+
+    /**
+     * Deletes entry and sibling lock if found.
+     *
+     * @param string $path
+     */
+    private function unlinkEntry(string $path): void
+    {
+        if (file_exists($path)) {
+            unlink($path);
+        }
+        if (file_exists($path.".lock")) {
+            unlink($path.".lock");
         }
     }
 }

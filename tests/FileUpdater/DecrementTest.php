@@ -3,9 +3,9 @@
 namespace Test\Lucinda\DB\FileUpdater;
 
 use Lucinda\DB\FileUpdater\Decrement;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 
-class DecrementTest
+class DecrementTest extends TestCase
 {
     private $object;
     private $value = 2;
@@ -17,12 +17,12 @@ class DecrementTest
 
     public function update()
     {
-        return new Result($this->object->update($this->value));
+        return $this->assertTrue($this->object->update($this->value));
     }
 
 
     public function getValue()
     {
-        return new Result($this->object->getValue()==1);
+        return $this->assertEquals(1, $this->object->getValue());
     }
 }

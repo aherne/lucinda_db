@@ -4,9 +4,9 @@ namespace Test\Lucinda\DB;
 
 use Lucinda\DB\SchemaDriver;
 use Lucinda\DB\Configuration;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 
-class SchemaDriverTest
+class SchemaDriverTest extends TestCase
 {
     private $configuration;
     private $object;
@@ -19,13 +19,13 @@ class SchemaDriverTest
 
     public function create()
     {
-        return new Result($this->object->create());
+        return $this->assertTrue($this->object->create());
     }
 
 
     public function exists()
     {
-        return new Result($this->object->exists());
+        return $this->assertTrue($this->object->exists());
     }
 
 
@@ -42,30 +42,30 @@ class SchemaDriverTest
                 file_put_contents($schema."/". implode("_", $info["tags"]).".json", $info["value"]);
             }
         }
-        return new Result($this->object->getCapacity()==2);
+        return $this->assertEquals(2, $this->object->getCapacity());
     }
 
 
     public function getAll()
     {
-        return new Result($this->object->getAll()==["a_b.json", "b_c.json"]);
+        return $this->assertEquals(["a_b.json", "b_c.json"], $this->object->getAll());
     }
 
 
     public function getByTag()
     {
-        return new Result($this->object->getByTag("c")==["b_c.json"]);
+        return $this->assertEquals(["b_c.json"], $this->object->getByTag("c"));
     }
 
 
     public function deleteAll()
     {
-        return new Result($this->object->deleteAll()==2);
+        return $this->assertEquals(2, $this->object->deleteAll());
     }
 
 
     public function drop()
     {
-        return new Result($this->object->drop());
+        return $this->assertTrue($this->object->drop());
     }
 }

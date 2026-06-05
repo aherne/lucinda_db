@@ -3,10 +3,10 @@
 namespace Test\Lucinda\DB;
 
 use Lucinda\DB\Folder;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 use Lucinda\DB\FileDeleter\All;
 
-class FolderTest
+class FolderTest extends TestCase
 {
     private $folder;
     private $object;
@@ -19,40 +19,43 @@ class FolderTest
 
     public function create()
     {
-        return new Result($this->object->create(0777));
+        return $this->assertTrue($this->object->create(0777));
     }
 
 
     public function exists()
     {
-        return new Result($this->object->exists());
+        return $this->assertTrue($this->object->exists());
     }
 
 
     public function isWritable()
     {
-        return new Result($this->object->isWritable());
+        return $this->assertTrue($this->object->isWritable());
     }
 
 
     public function scan()
     {
         file_put_contents($this->folder."/a.json", "x");
+        file_put_contents($this->folder."/a.json.lock", "x");
+        file_put_contents($this->folder."/temporary", "x");
         $scanner = new \Lucinda\DB\FileInspector\Counter();
         $this->object->scan($scanner);
-        return new Result($scanner->getValue()==1);
+        return $this->assertEquals(1, $scanner->getValue());
     }
 
 
     public function clear()
     {
         file_put_contents($this->folder."/a.json", "x");
-        return new Result($this->object->clear(new All())==1);
+        file_put_contents($this->folder."/temporary", "x");
+        return $this->assertEquals(1, $this->object->clear(new All()));
     }
 
     public function delete()
     {
         $this->object->delete();
-        return new Result(!$this->object->exists());
+        return $this->assertFalse($this->object->exists());
     }
 }

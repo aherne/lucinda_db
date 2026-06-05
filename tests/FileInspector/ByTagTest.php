@@ -4,9 +4,9 @@ namespace Test\Lucinda\DB\FileInspector;
 
 use Lucinda\DB\FileInspector\ByTag;
 use Lucinda\DB\Key;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 
-class ByTagTest
+class ByTagTest extends TestCase
 {
     private $inspector;
 
@@ -26,12 +26,12 @@ class ByTagTest
             $object = new Key($info);
             $this->inspector->inspect($schema, $object->getValue().".json");
         }
-        return new Result(true);
+        return $this->assertEquals(["a_b.json"], $this->inspector->getEntries());
     }
 
 
     public function getEntries()
     {
-        return new Result($this->inspector->getEntries()==["a_b.json"]);
+        return $this->assertEquals(["a_b.json"], $this->inspector->getEntries());
     }
 }

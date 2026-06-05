@@ -67,7 +67,13 @@ class CapacityHeap extends \SplMaxHeap
     {
         $info = $this->extract();
         foreach ($this->schemas as $schema) {
-            unlink($schema."/".$info["file"]);
+            $path = $schema."/".$info["file"];
+            if (file_exists($path)) {
+                unlink($path);
+            }
+            if (file_exists($path.".lock")) {
+                unlink($path.".lock");
+            }
         }
         $this->totalDeleted++;
     }

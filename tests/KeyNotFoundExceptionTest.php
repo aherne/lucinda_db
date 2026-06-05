@@ -2,6 +2,6 @@
 
 namespace Test\Lucinda\DB;
 
-class KeyNotFoundExceptionTest
+class KeyNotFoundExceptionTest extends TestCase
 {
 }

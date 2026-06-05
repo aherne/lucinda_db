@@ -6,9 +6,9 @@ use Lucinda\DB\FileInspector\Importer;
 use Lucinda\DB\Key;
 use Lucinda\DB\Value;
 use Lucinda\DB\Schema;
-use Lucinda\UnitTest\Result;
+use Test\Lucinda\DB\TestCase;
 
-class ImporterTest
+class ImporterTest extends TestCase
 {
     public function inspect()
     {
@@ -46,6 +46,6 @@ class ImporterTest
         rmdir($sourceSchema);
         rmdir($destinationSchema);
 
-        return new Result($capacity==3);
+        return $this->assertEquals(3, $capacity);
     }
 }
