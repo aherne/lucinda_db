@@ -6,18 +6,36 @@ use Lucinda\DB\FileUpdater\Increment;
 use Lucinda\DB\FileUpdater\Decrement;
 
 /**
- * Encapsulates value in KV store based on schema and key
+ * Operates on one key inside one schema folder
+ *
+ * The entry path is schema/key.json. JSON encoding, decoding, atomic replacement,
+ * and mutation locking are delegated to File. Read, counter, and deletion methods
+ * require an existing entry; set() may create it. Counter operations expect an
+ * integer-compatible stored value and do not validate arbitrary payload types.
+ *
+ * @see Key
+ * @see File
+ * @see ValueOperations
  */
 final class Value implements ValueOperations
 {
+    /**
+     * Directory holding this entry
+     */
     private string $schema;
+
+    /**
+     * Filename stem used inside the schema folder
+     */
     private string $key;
 
     /**
-     * Constructs entry based on schema folder and tags it depends on
+     * Binds entry operations to a schema folder and filename stem
      *
-     * @param string $schema Folder holding entries
-     * @param string $key    Value of entry key
+     * The supplied key is used directly; use Key or Wrapper when deriving it from tags.
+     *
+     * @param string $schema Existing writable schema directory
+     * @param string $key Filename stem without the .json suffix
      */
     public function __construct(string $schema, string $key)
     {
@@ -26,10 +44,12 @@ final class Value implements ValueOperations
     }
 
     /**
-     * Sets entry value
+     * Creates or replaces the entry's JSON value
      *
-     * @param  mixed $value
-     * @throws \JsonException
+     * @param mixed $value JSON-encodable payload
+     * @throws \JsonException If encoding fails
+     * @throws LockException If the entry mutex cannot be acquired
+     * @throws \RuntimeException If replacing the entry file fails
      */
     public function set(mixed $value): void
     {
@@ -38,11 +58,11 @@ final class Value implements ValueOperations
     }
 
     /**
-     * Gets existing entry value
+     * Reads and decodes an existing entry
      *
-     * @throws KeyNotFoundException If entry doesn't exist
-     * @throws \JsonException
-     * @return mixed
+     * @return mixed Stored JSON value, with objects decoded as associative arrays
+     * @throws KeyNotFoundException If the entry file does not exist
+     * @throws \JsonException If the stored contents cannot be decoded
      */
     public function get(): mixed
     {
@@ -54,9 +74,9 @@ final class Value implements ValueOperations
     }
 
     /**
-     * Checks if entry exists
+     * Checks whether this schema contains the entry file
      *
-     * @return bool
+     * @return bool True when the entry path exists
      */
     public function exists(): bool
     {
@@ -65,13 +85,14 @@ final class Value implements ValueOperations
     }
 
     /**
-     * Increments existing entry and returns value
+     * Increments an existing integer value under its exclusive mutex
      *
-     * @param  int $step Step of incrementation
-     * @throws KeyNotFoundException If entry doesn't exist
-     * @throws \JsonException If value could not be decoded
-     * @throws LockException If mutex could not be acquired.
-     * @return int
+     * @param int $step Amount to add, defaulting to one
+     * @return int Value produced by the updater
+     * @throws KeyNotFoundException If the entry does not exist
+     * @throws \JsonException If reading or encoding fails
+     * @throws LockException If the entry mutex cannot be acquired
+     * @throws \RuntimeException If the updated file cannot be replaced
      */
     public function increment(int $step = 1): int
     {
@@ -87,13 +108,14 @@ final class Value implements ValueOperations
     }
 
     /**
-     * Decrements existing entry and returns value
+     * Decrements an existing integer value under its exclusive mutex
      *
-     * @param  int $step Step of decrementation
-     * @throws KeyNotFoundException If entry doesn't exist
-     * @throws \JsonException If value could not be decoded
-     * @throws LockException If mutex could not be acquired.
-     * @return int
+     * @param int $step Amount to subtract, defaulting to one
+     * @return int Value produced by the updater
+     * @throws KeyNotFoundException If the entry does not exist
+     * @throws \JsonException If reading or encoding fails
+     * @throws LockException If the entry mutex cannot be acquired
+     * @throws \RuntimeException If the updated file cannot be replaced
      */
     public function decrement(int $step = 1): int
     {
@@ -109,9 +131,10 @@ final class Value implements ValueOperations
     }
 
     /**
-     * Deletes existing entry
+     * Deletes an existing entry while holding its file mutex
      *
-     * @throws KeyNotFoundException If entry doesn't exist
+     * @throws KeyNotFoundException If the entry does not exist
+     * @throws LockException If the entry mutex cannot be acquired
      */
     public function delete(): void
     {

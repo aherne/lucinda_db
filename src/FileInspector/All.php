@@ -5,19 +5,27 @@ namespace Lucinda\DB\FileInspector;
 use Lucinda\DB\FileInspector;
 
 /**
- * Encapsulates a inspector that selects all entries in schema
+ * Collects every entry basename supplied by a schema scan
+ *
+ * Results accumulate in visit order for the lifetime of the inspector. Folder
+ * filters the .json extension; direct calls are only checked against dot entries.
+ *
+ * @see \Lucinda\DB\Folder
  */
 final class All implements FileInspector
 {
     /**
-     * @var string[]
+     * @var string[] Filenames accumulated across inspections
      */
     private array $entries = [];
 
     /**
-     * {@inheritDoc}
+     * Processes one filename supplied by the folder scan
      *
-     * @see \Lucinda\DB\FileInspector::inspect()
+     * Appends the basename unless it is a dot-directory entry.
+     *
+     * @param string $folder Source schema directory
+     * @param string $file Entry basename including its .json suffix
      */
     public function inspect(string $folder, string $file): void
     {
@@ -27,9 +35,9 @@ final class All implements FileInspector
     }
 
     /**
-     * Gets all entries found in schema
+     * Gets the filenames collected so far without clearing the inspector
      *
-     * @return string[]
+     * @return string[] Matching basenames in scan order
      */
     public function getEntries(): array
     {

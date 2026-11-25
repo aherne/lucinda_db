@@ -2,12 +2,9 @@
 <!DOCTYPE xml>
 <xml>
   <lucinda_db>
-    <local>
-      <schemas>
-        <schema>tests/myClient1</schema>
-        <schema>tests/myClient2</schema>
-        
-      </schemas>
-    </local>
+    <schemas>
+      <schema>tests/myClient1</schema>
+      <schema>tests/myClient2</schema>
+    </schemas>
   </lucinda_db>
 </xml>

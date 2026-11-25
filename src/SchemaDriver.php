@@ -4,17 +4,28 @@ namespace Lucinda\DB;
 
 use Lucinda\DB\FileDeleter\All as DeleteAll;
 
+/**
+ * Coordinates schema operations over a captured set of replica directories
+ *
+ * Creation, existence checks, and dropping visit every configured schema. Listing,
+ * counting, and tag queries use one randomly chosen replica. deleteAll() scans one
+ * replica and deletes those filenames from all replicas, counting logical entries.
+ * These operations assume compatible replica contents and are not transactional.
+ *
+ * @see Schema
+ * @see SchemaOperations
+ */
 final class SchemaDriver implements SchemaOperations
 {
     /**
-     * @var string[]
+     * @var string[] Replica paths used by schema operations
      */
     private array $schemas = [];
 
     /**
-     * Sets up database entry to query based on Configuration object and tags key is composed of
+     * Captures the list of schema folders to coordinate
      *
-     * @param string[] $schemas
+     * @param string[] $schemas Nonempty replica list indexed consecutively from zero
      */
     public function __construct(array $schemas)
     {
@@ -22,7 +33,13 @@ final class SchemaDriver implements SchemaOperations
     }
 
     /**
-     * Creates schemas on disk
+     * Attempts to create each unavailable schema directory
+     *
+     * An already existing writable schema makes the aggregate result false. Operations
+     * on later schemas still run. Individual mkdir() results are not aggregated;
+     * check exists() afterwards when availability must be confirmed.
+     *
+     * @return bool True when every schema needed a creation attempt
      */
     public function create(): bool
     {
@@ -39,9 +56,9 @@ final class SchemaDriver implements SchemaOperations
     }
 
     /**
-     * Checks if schemas exists and it is writable
+     * Checks whether every configured schema is a writable directory
      *
-     * @return boolean
+     * @return bool True if all configured schemas satisfy Schema::exists()
      */
     public function exists(): bool
     {
@@ -55,9 +72,11 @@ final class SchemaDriver implements SchemaOperations
     }
 
     /**
-     * Gets number of entries in schema
+     * Counts entries in one randomly selected replica
      *
-     * @return int Number of entries (keys) found
+     * Assumes replicas are consistent; does not aggregate counts across folders.
+     *
+     * @return int Number of .json entries in the selected schema
      */
     public function getCapacity(): int
     {
@@ -66,9 +85,9 @@ final class SchemaDriver implements SchemaOperations
     }
 
     /**
-     * Gets all keys in schema sorted alphabetically
+     * Lists entries from one randomly selected replica
      *
-     * @return string[] List of keys found in schema
+     * @return string[] Alphabetically sorted .json filenames from the selected schema
      */
     public function getAll(): array
     {
@@ -77,10 +96,11 @@ final class SchemaDriver implements SchemaOperations
     }
 
     /**
-     * Gets all keys in schema matching tag sorted alphabetically
+     * Lists matching entries from one randomly selected replica
      *
-     * @param  string $tag Tag name
-     * @return string[] List of keys found in schema
+     * @param string $tag Valid lowercase tag matched as a complete key segment
+     * @return string[] Sorted matching .json filenames
+     * @throws KeyException If tag validation fails
      */
     public function getByTag(string $tag): array
     {
@@ -89,9 +109,11 @@ final class SchemaDriver implements SchemaOperations
     }
 
     /**
-     * Deletes all entries in schema
+     * Scans one replica and removes its entry filenames from every replica
      *
-     * @return int Number of entries deleted
+     * Files present only in other replicas are not discovered by this scan.
+     *
+     * @return int Number of logical entries discovered in the selected schema
      */
     public function deleteAll(): int
     {
@@ -100,9 +122,12 @@ final class SchemaDriver implements SchemaOperations
     }
 
     /**
-     * Creates schema on disk
+     * Drops each existing writable schema directory
      *
-     * @return boolean
+     * An already missing or unwritable schema makes the aggregate result false.
+     * Individual Schema::drop() results are not used in the returned value.
+     *
+     * @return bool True when every schema satisfied exists() before its drop attempt
      */
     public function drop(): bool
     {

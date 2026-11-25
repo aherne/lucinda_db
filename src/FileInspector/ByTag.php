@@ -5,16 +5,32 @@ namespace Lucinda\DB\FileInspector;
 use Lucinda\DB\FileInspector;
 
 /**
- * Encapsulates a inspector that selects all entries in schema by tag
+ * Collects entry basenames whose canonical key contains a complete tag
+ *
+ * The tag is validated with Key. Matches occur at filename boundaries or
+ * underscore separators, preventing a short tag from matching a longer segment.
+ * Results accumulate in visit order and are not sorted by this inspector.
+ *
+ * @see \Lucinda\DB\Folder
  */
 final class ByTag implements FileInspector
 {
-    private string $tag;
     /**
-     * @var string[]
+     * Validated tag matched at key-segment boundaries
+     */
+    private string $tag;
+
+    /**
+     * @var string[] Filenames accumulated across inspections
      */
     private array $entries = [];
 
+    /**
+     * Validates and captures the tag used for filename matching
+     *
+     * @param string $tag One complete lowercase tag segment
+     * @throws \Lucinda\DB\KeyException If the tag contains unsupported characters
+     */
     public function __construct(string $tag)
     {
         new \Lucinda\DB\Key([$tag]);
@@ -22,9 +38,12 @@ final class ByTag implements FileInspector
     }
 
     /**
-     * {@inheritDoc}
+     * Processes one filename supplied by the folder scan
      *
-     * @see \Lucinda\DB\FileInspector::inspect()
+     * Appends the basename only when a complete tag segment matches.
+     *
+     * @param string $folder Source schema directory
+     * @param string $file Entry basename including its .json suffix
      */
     public function inspect(string $folder, string $file): void
     {
@@ -34,9 +53,9 @@ final class ByTag implements FileInspector
     }
 
     /**
-     * Gets all entries found in schema
+     * Gets the filenames collected so far without clearing the inspector
      *
-     * @return string[]
+     * @return string[] Matching basenames in scan order
      */
     public function getEntries(): array
     {

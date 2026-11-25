@@ -5,17 +5,28 @@ namespace Lucinda\DB\FileUpdater;
 use Lucinda\DB\FileUpdater;
 
 /**
- * Encapsulates an updater that increments existing entry value (assuming by default it's integer)
+ * Transforms a decoded integer-compatible value by arithmetic increment
+ *
+ * File invokes this callback while holding its entry mutex. Each update stores
+ * the resulting integer for getValue() and requests persistence. Call update()
+ * before reading the result; arbitrary JSON payload types are not validated.
  */
 final class Increment implements FileUpdater
 {
+    /**
+     * Amount to add during each update
+     */
     private int $step;
+
+    /**
+     * Result of the most recent update; initialized by update()
+     */
     private int $value;
 
     /**
-     * Constructs by entry key
+     * Captures the counter step used by subsequent updates
      *
-     * @param int $step Step of incrementation
+     * @param int $step Amount to add, defaulting to one
      */
     public function __construct(int $step = 1)
     {
@@ -23,9 +34,10 @@ final class Increment implements FileUpdater
     }
 
     /**
-     * {@inheritDoc}
+     * Applies the configured step and captures the incremented value
      *
-     * @see \Lucinda\DB\FileUpdater::update()
+     * @param mixed $json Integer-compatible value modified in place
+     * @return bool Always true, requesting that File persist the result
      */
     public function update(mixed &$json): bool
     {
@@ -35,9 +47,9 @@ final class Increment implements FileUpdater
     }
 
     /**
-     * Gets incremented value
+     * Gets the counter result from the most recent update
      *
-     * @return int
+     * @return int Result captured by update(); update() must have run first
      */
     public function getValue(): int
     {

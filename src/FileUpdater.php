@@ -3,15 +3,21 @@
 namespace Lucinda\DB;
 
 /**
- * Defines blueprints of entry value update algorithm
+ * Defines an in-memory transformation used inside File's mutation mutex
+ *
+ * The updater receives a decoded JSON value by reference. Returning true asks File
+ * to encode and persist the changed value; false leaves the stored file untouched.
+ * A missing or empty file is supplied as an empty array.
+ *
+ * @see File
  */
 interface FileUpdater
 {
     /**
-     * Attempts to perform a value update, if applicable
+     * Attempts to transform the referenced decoded JSON value
      *
-     * @param  mixed $json Existing decoded entry value
-     * @return bool Whether update was done.
+     * @param mixed $json Current value, modified in place when an update is needed
+     * @return bool True to persist the resulting value; false to skip replacement
      */
     public function update(mixed &$json): bool;
 }

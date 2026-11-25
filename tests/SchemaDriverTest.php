@@ -6,14 +6,14 @@ use Lucinda\DB\SchemaDriver;
 use Lucinda\DB\Configuration;
 use Test\Lucinda\DB\TestCase;
 
-class SchemaDriverTest extends TestCase
+final class SchemaDriverTest extends TestCase
 {
     private $configuration;
     private $object;
 
     public function __construct()
     {
-        $this->configuration = new Configuration(__DIR__."/tests.xml", "local");
+        $this->configuration = new Configuration(simplexml_load_file(__DIR__."/tests.xml"));
         $this->object = new SchemaDriver($this->configuration->getSchemas());
     }
 

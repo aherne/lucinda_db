@@ -3,16 +3,30 @@
 namespace Lucinda\DB;
 
 /**
- * Encapsulates a folder and its operations
+ * Traverses and mutates one filesystem directory for entry algorithms
+ *
+ * scan() and clear() dispatch only filenames ending in .json, without sorting or
+ * reading their contents. Callbacks own inspection and deletion behavior. The
+ * extension filter checks names, not file type. Direct folder deletion removes
+ * immediate regular files of every extension, then attempts rmdir().
+ *
+ * Directory operations use PHP filesystem functions and may emit warnings when
+ * paths or permissions are invalid. They do not take entry or directory mutexes.
+ *
+ * @see FileInspector
+ * @see FileDeleter
  */
 final class Folder
 {
+    /**
+     * Directory path retained for filesystem operations
+     */
     private string $path;
 
     /**
-     * Constructs folder by absolute path
+     * Captures the folder path without creating or validating it
      *
-     * @param string $path
+     * @param string $path Directory on which subsequent operations act
      */
     public function __construct(string $path)
     {
@@ -20,10 +34,12 @@ final class Folder
     }
 
     /**
-     * Creates folder
+     * Creates one directory using the supplied permissions
      *
-     * @param  int $permissions Rights folder is
-     * @return bool Whether or not folder was created
+     * The process umask may reduce the requested permissions; parents are not created.
+     *
+     * @param int $permissions Requested octal permission mode, such as 0777
+     * @return bool Whether mkdir() successfully created the directory
      */
     public function create(int $permissions): bool
     {
@@ -31,9 +47,9 @@ final class Folder
     }
 
     /**
-     * Checks if folder exists
+     * Checks whether the path identifies a directory
      *
-     * @return bool
+     * @return bool True for an existing directory
      */
     public function exists(): bool
     {
@@ -41,9 +57,9 @@ final class Folder
     }
 
     /**
-     * Checks if folder is writable
+     * Checks whether PHP considers the path writable
      *
-     * @return bool
+     * @return bool Result of the filesystem writability check
      */
     public function isWritable(): bool
     {
@@ -51,9 +67,9 @@ final class Folder
     }
 
     /**
-     * Scans folder of files and applies inspection algorithm on each entry
+     * Invokes an inspector for every .json filename in directory iteration order
      *
-     * @param FileInspector $inspector
+     * @param FileInspector $inspector Callback receiving the folder and each entry basename
      */
     public function scan(FileInspector $inspector): void
     {
@@ -67,10 +83,13 @@ final class Folder
     }
 
     /**
-     * Clears folder of files matching callback and returns how many were deleted
+     * Invokes a deletion algorithm for every .json filename
      *
-     * @param  FileDeleter $deleter Encapsulates algorithm of file deletion
-     * @return int Number of files deleted
+     * The count follows callback return values. Algorithms may delete physical
+     * replicas elsewhere or report their own totals separately.
+     *
+     * @param FileDeleter $deleter Algorithm receiving the folder and each entry basename
+     * @return int Number of callbacks returning true
      */
     public function clear(FileDeleter $deleter): int
     {
@@ -86,7 +105,9 @@ final class Folder
     }
 
     /**
-     * Deletes folder from disk
+     * Removes immediate regular files and then the directory itself
+     *
+     * Includes non-entry files. Child directories are retained and can prevent rmdir().
      */
     public function delete(): void
     {
@@ -101,10 +122,10 @@ final class Folder
     }
 
     /**
-     * Checks if a file is a database entry.
+     * Checks the filename convention used during scans and clears
      *
-     * @param string $file
-     * @return bool
+     * @param string $file Directory entry basename
+     * @return bool True when the name ends in .json and is not a dot entry
      */
     private function isEntryFile(string $file): bool
     {

@@ -3,24 +3,46 @@
 namespace Lucinda\DB\FileDeleter;
 
 /**
- * Encapsulates a queue of files sorted by modification time that shrinks to min capacity when max capacity is reached.
+ * Retains recent scanned entries and evicts older entries at a size threshold
+ *
+ * Candidates store an entry basename and a modification timestamp read from one
+ * random replica. Reversed timestamp comparison makes the oldest candidate the
+ * next extracted element. Each time the heap reaches maxCapacity, entries are
+ * removed until minCapacity remains; their filenames are deleted across schemas.
+ *
+ * Deletion counts logical entries rather than physical files. Equal timestamps
+ * have no stable eviction order. Filesystem deletion bypasses File mutexes.
+ *
+ * @see ByCapacity
  */
 final class CapacityHeap extends \SplMaxHeap
 {
-    protected int $minCapacity;
-    protected int $maxCapacity;
-    protected int $totalDeleted = 0;
     /**
-     * @var string[]
+     * Heap population retained after each eviction batch
+     */
+    private int $minCapacity;
+
+    /**
+     * Heap size triggering an eviction batch
+     */
+    private int $maxCapacity;
+
+    /**
+     * Cumulative number of logical candidates evicted
+     */
+    private int $totalDeleted = 0;
+
+    /**
+     * @var string[] Replica directories targeted by eviction
      */
     private array $schemas = [];
 
     /**
-     * Constructs by user-specified maximum/minimum database entry capacity
+     * Captures replica paths and the heap eviction thresholds
      *
-     * @param string[] $schemas     Replicas on whom database is distributed
-     * @param int      $minCapacity Number of entries allowed to remain if database reached max capacity.
-     * @param int      $maxCapacity Maximum number of entries allowed to exist in database.
+     * @param string[] $schemas Nonempty replica list indexed consecutively from zero
+     * @param int $minCapacity Entries retained after a threshold-triggered batch
+     * @param int $maxCapacity Trigger size; use 0 <= minCapacity < maxCapacity
      */
     public function __construct(array $schemas, int $minCapacity, int $maxCapacity)
     {
@@ -30,9 +52,11 @@ final class CapacityHeap extends \SplMaxHeap
     }
 
     /**
-     * {@inheritDoc}
+     * Orders candidates so extraction chooses the oldest timestamp
      *
-     * @see \SplMaxHeap::compare()
+     * @param array<string,int|string> $value1 Candidate containing file and date
+     * @param array<string,int|string> $value2 Candidate containing file and date
+     * @return int Positive when the first candidate is older than the second
      */
     protected function compare(mixed $value1, mixed $value2): int
     {
@@ -40,9 +64,11 @@ final class CapacityHeap extends \SplMaxHeap
     }
 
     /**
-     * Push file to queue
+     * Queues an entry basename and evicts oldest candidates at the threshold
      *
-     * @param string $filePath Absolute file location on disk.
+     * The argument is a basename relative to every schema, despite its parameter name.
+     *
+     * @param string $filePath Entry basename, for example users_roles.json
      */
     public function push(string $filePath): void
     {
@@ -61,7 +87,9 @@ final class CapacityHeap extends \SplMaxHeap
     }
 
     /**
-     * Pops file from queue and deletes it from disk
+     * Extracts the oldest candidate and removes its files from every schema
+     *
+     * Also removes legacy sibling lock files and increments the logical eviction count.
      */
     protected function pop(): void
     {
@@ -79,9 +107,9 @@ final class CapacityHeap extends \SplMaxHeap
     }
 
     /**
-     * Gets total number of files deleted
+     * Gets the cumulative number of candidates evicted
      *
-     * @return int
+     * @return int Logical entries removed since construction
      */
     public function getTotalDeleted(): int
     {

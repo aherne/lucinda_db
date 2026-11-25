@@ -5,21 +5,30 @@ namespace Lucinda\DB\FileDeleter;
 use Lucinda\DB\FileDeleter;
 
 /**
- * Encapsulates a deleter that clears database of all entries whose key includes tag
+ * Deletes visited entries whose key contains a complete validated tag
+ *
+ * Matches whole underscore-separated segments or filename boundaries. With a
+ * replica list, matching filenames are removed from each replica; otherwise the
+ * scanned folder is used. Deletions bypass File mutexes and include legacy locks.
  */
 final class ByTag implements FileDeleter
 {
-    private string $tag;
     /**
-     * @var string[]
+     * Validated tag used for complete-segment matching
+     */
+    private string $tag;
+
+    /**
+     * @var string[] Replica directories targeted by a matching deletion
      */
     private array $replicas = [];
 
     /**
-     * Constructs by tag to match
+     * Validates a tag and captures the optional replica deletion scope
      *
-     * @param string   $tag      Name of tag to match
-     * @param string[] $replicas Replicas on whom database is distributed
+     * @param string $tag Complete lowercase tag segment to match
+     * @param string[] $replicas Replica paths, or an empty list to use the scanned folder
+     * @throws \Lucinda\DB\KeyException If the tag is invalid
      */
     public function __construct(string $tag, array $replicas = [])
     {
@@ -29,9 +38,13 @@ final class ByTag implements FileDeleter
     }
 
     /**
-     * {@inheritDoc}
+     * Evaluates the entry and removes qualifying replica files
      *
-     * @see \Lucinda\DB\FileDeleter::delete()
+     * Removes matching paths directly; no entry mutex is acquired.
+     *
+     * @param string $folder Directory containing the scanned filename
+     * @param string $file Entry basename including its .json suffix
+     * @return bool True when the entry qualifies for this deletion algorithm
      */
     public function delete(string $folder, string $file): bool
     {
@@ -50,9 +63,11 @@ final class ByTag implements FileDeleter
     }
 
     /**
-     * Deletes entry and sibling lock if found.
+     * Removes an entry file and any legacy sibling lock file
      *
-     * @param string $path
+     * Missing paths are skipped. The modern temporary-directory mutex is unaffected.
+     *
+     * @param string $path Complete entry filename to remove
      */
     private function unlinkEntry(string $path): void
     {

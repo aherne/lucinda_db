@@ -3,31 +3,52 @@
 namespace Test\Lucinda\DB;
 
 use Lucinda\DB\Configuration;
-use Test\Lucinda\DB\TestCase;
+use Lucinda\DB\ConfigurationException;
+use Lucinda\UnitTest\Result;
 
-class ConfigurationTest extends TestCase
+/**
+ * Verifies schema extraction from caller-supplied, environment-independent XML.
+ */
+final class ConfigurationTest extends TestCase
 {
-    public function getSchemas()
+    /**
+     * Checks schema order and support for a single schema and the shared fixture.
+     *
+     * @return Result[] Configuration parsing assertions
+     */
+    public function getSchemas(): array
     {
-        $object = new Configuration(__DIR__."/tests.xml", "local");
-        return $this->assertEquals(["tests/myClient1", "tests/myClient2"], $object->getSchemas());
+        $configuration = new Configuration(simplexml_load_file(__DIR__."/tests.xml"));
+        $single = new Configuration(new \SimpleXMLElement(
+            '<xml><lucinda_db><schemas><schema>/tmp/schema</schema></schemas></lucinda_db></xml>'
+        ));
+        return [
+            $this->assertEquals(["tests/myClient1", "tests/myClient2"], $configuration->getSchemas()),
+            $this->assertEquals(["/tmp/schema"], $single->getSchemas())
+        ];
     }
 
-
-    public function addSchema()
+    /**
+     * Rejects missing configuration, empty schema lists, and the old layout.
+     *
+     * @return Result[] Invalid-configuration assertions
+     */
+    public function rejectsInvalidConfiguration(): array
     {
-        $object1 = new Configuration(__DIR__."/tests.xml", "local");
-        $object1->addSchema("tests/myClient3");
-        $object2 = new Configuration(__DIR__."/tests.xml", "local");
-        return $this->assertEquals(["tests/myClient1", "tests/myClient2", "tests/myClient3"], $object2->getSchemas());
-    }
-
-
-    public function removeSchema()
-    {
-        $object1 = new Configuration(__DIR__."/tests.xml", "local");
-        $object1->removeSchema("tests/myClient3");
-        $object2 = new Configuration(__DIR__."/tests.xml", "local");
-        return $this->assertEquals(["tests/myClient1", "tests/myClient2"], $object2->getSchemas());
+        $results = [];
+        foreach ([
+            '<xml/>',
+            '<xml><lucinda_db><schemas/></lucinda_db></xml>',
+            '<xml><lucinda_db><local><schemas><schema>/tmp/schema</schema></schemas></local></lucinda_db></xml>'
+        ] as $source) {
+            $exception = null;
+            try {
+                new Configuration(new \SimpleXMLElement($source));
+            } catch (ConfigurationException $error) {
+                $exception = $error;
+            }
+            $results[] = $this->assertInstanceOf(ConfigurationException::class, $exception);
+        }
+        return $results;
     }
 }

@@ -5,18 +5,27 @@ namespace Lucinda\DB\FileDeleter;
 use Lucinda\DB\FileDeleter;
 
 /**
- * Encapsulates a deleter that clears database of all older entries past a max capacity
+ * Feeds scanned entry filenames into a timestamp-based eviction heap
+ *
+ * Each callback queues an entry and may trigger eviction across replicas. delete()
+ * always returns false, so Folder::clear() cannot provide this algorithm's count;
+ * call getTotal() after the scan. The same instance retains its heap and total.
+ *
+ * @see CapacityHeap
  */
 final class ByCapacity implements FileDeleter
 {
+    /**
+     * Heap retaining candidates and counting evictions
+     */
     private CapacityHeap $capacityHeap;
 
     /**
-     * Constructs by user-specified maximum database entry capacity
+     * Creates the heap using replica paths and eviction thresholds
      *
-     * @param string[] $replicas    Replicas on whom database is distributed
-     * @param int      $minCapacity Number of entries allowed to remain if database reached max capacity.
-     * @param int      $maxCapacity Maximum number of entries allowed to exist in database.
+     * @param string[] $replicas Nonempty replica list indexed consecutively from zero
+     * @param int $minCapacity Entries retained after each eviction batch
+     * @param int $maxCapacity Trigger size; use 0 <= minCapacity < maxCapacity
      */
     public function __construct(array $replicas, int $minCapacity, int $maxCapacity)
     {
@@ -24,9 +33,11 @@ final class ByCapacity implements FileDeleter
     }
 
     /**
-     * {@inheritDoc}
+     * Queues a filename and allows the heap to evict entries as needed
      *
-     * @see \Lucinda\DB\FileDeleter::delete()
+     * @param string $folder Scanned schema directory; timestamp selection is handled by the heap
+     * @param string $file Entry basename including its .json suffix
+     * @return bool Always false; use getTotal() for the actual deletion count
      */
     public function delete(string $folder, string $file): bool
     {
@@ -37,9 +48,9 @@ final class ByCapacity implements FileDeleter
     }
 
     /**
-     * Gets total of elements deleted
+     * Gets the cumulative logical-entry eviction count
      *
-     * @return int Number of elements deleted
+     * @return int Entries removed by this instance's heap
      */
     public function getTotal(): int
     {

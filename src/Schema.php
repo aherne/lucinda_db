@@ -10,16 +10,27 @@ use Lucinda\DB\FileInspector\ByTag as InspectTag;
 use Lucinda\DB\FileInspector\Importer;
 
 /**
- * Encapsulates operations on a LucindaDB folder schema [4,294,967,295]
+ * Performs filesystem operations on a single database replica directory
+ *
+ * Entry scans consider filenames ending in .json. Listing and counting do not
+ * read their payloads. Deletion callbacks remove entries directly, without File's
+ * mutex, while population copies missing files and preserves modification times.
+ * Callers must provide readable/writable directories as appropriate.
+ *
+ * @see Folder
+ * @see SchemaOperations
  */
 final class Schema implements SchemaOperations
 {
+    /**
+     * Path to this schema directory
+     */
     private string $path;
 
     /**
-     * Constructs based on schema folder
+     * Captures the schema folder on which later operations act
      *
-     * @param string $schema
+     * @param string $schema Schema directory path, retained without normalization
      */
     public function __construct(string $schema)
     {
@@ -27,7 +38,11 @@ final class Schema implements SchemaOperations
     }
 
     /**
-     * Creates schema on disk
+     * Creates the schema directory with requested mode 0777
+     *
+     * The process umask can reduce permissions. Parent directories must already exist.
+     *
+     * @return bool Result of the directory-creation operation
      */
     public function create(): bool
     {
@@ -36,9 +51,9 @@ final class Schema implements SchemaOperations
     }
 
     /**
-     * Checks if schema exists and it is writable
+     * Checks whether the schema is a writable directory
      *
-     * @return boolean
+     * @return bool True when the directory exists and PHP considers it writable
      */
     public function exists(): bool
     {
@@ -47,9 +62,9 @@ final class Schema implements SchemaOperations
     }
 
     /**
-     * Gets number of entries in schema
+     * Counts .json entries in the schema directory
      *
-     * @return int Number of entries (keys) found
+     * @return int Number of filenames visited by the entry counter
      */
     public function getCapacity(): int
     {
@@ -60,9 +75,9 @@ final class Schema implements SchemaOperations
     }
 
     /**
-     * Gets all keys in schema sorted alphabetically
+     * Lists entry filenames in alphabetical order
      *
-     * @return string[] List of keys found in schema
+     * @return string[] Sorted filenames including their .json suffix
      */
     public function getAll(): array
     {
@@ -75,10 +90,11 @@ final class Schema implements SchemaOperations
     }
 
     /**
-     * Gets all keys in schema matching tag sorted alphabetically
+     * Lists entry filenames matching a complete tag segment
      *
-     * @param  string $tag Tag name
-     * @return string[] List of keys found in schema
+     * @param string $tag Valid lowercase tag to match between underscores or filename boundaries
+     * @return string[] Matching .json filenames in alphabetical order
+     * @throws KeyException If tag validation fails
      */
     public function getByTag(string $tag): array
     {
@@ -91,9 +107,11 @@ final class Schema implements SchemaOperations
     }
 
     /**
-     * Deletes all entries in schema
+     * Deletes every scanned database entry in this schema
      *
-     * @return int Number of entries deleted
+     * The schema directory remains. Legacy sibling .lock files are also removed.
+     *
+     * @return int Number of logical entry filenames removed
      */
     public function deleteAll(): int
     {
@@ -102,9 +120,12 @@ final class Schema implements SchemaOperations
     }
 
     /**
-     * Populates schema based on another one
+     * Copies missing entries from another schema while preserving timestamps
      *
-     * @param string $sourceSchema
+     * Existing destination filenames are skipped, even when their values differ.
+     * This copy does not use entry mutexes and does not overwrite existing replicas.
+     *
+     * @param string $sourceSchema Readable source directory containing .json entries
      */
     public function populate(string $sourceSchema): void
     {
@@ -113,9 +134,12 @@ final class Schema implements SchemaOperations
     }
 
     /**
-     * Drops schema from disk
+     * Clears entries and removes the schema directory
      *
-     * @return boolean
+     * Folder deletion also removes other immediate regular files. Subdirectories are
+     * not recursively removed. The returned value is the post-deletion exists() result.
+     *
+     * @return bool False after successful removal; true if the folder still exists
      */
     public function drop(): bool
     {

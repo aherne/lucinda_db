@@ -2,100 +2,170 @@
 
 namespace Test\Lucinda\DB;
 
-use Test\Lucinda\DB\TestCase;
-use Lucinda\DB\Configuration;
+use Lucinda\DB\KeyNotFoundException;
 use Lucinda\DB\ValueDriver;
+use Lucinda\UnitTest\Result;
 
-class ValueDriverTest extends TestCase
+/**
+ * Verifies replicated values using independent temporary directories per test.
+ */
+final class ValueDriverTest extends TestCase
 {
-    private $object;
-
-    public function __construct()
+    /** @return Result[] Every replica receives the same JSON payload */
+    public function set(): array
     {
-        mkdir(__DIR__."/myClient1", 0777);
-        mkdir(__DIR__."/myClient2", 0777);
-
-        // initialize
-        $configuration = new Configuration(__DIR__."/tests.xml", "local");
-        $this->object = new ValueDriver($configuration->getSchemas(), ["a","b"]);
+        return $this->runWithReplicas(function ($driver, $schemas) {
+            $driver->set(['answer' => 42]);
+            $results = [];
+            foreach ($schemas as $schema) {
+                $results[] = $this->assertEquals(['answer' => 42], json_decode(file_get_contents($schema.'/a_b.json'), true));
+            }
+            return $results;
+        });
     }
 
-    public function __destruct()
+    /** @return Result[] A stored payload is readable */
+    public function get(): array
     {
-        rmdir(__DIR__."/myClient1");
-        rmdir(__DIR__."/myClient2");
+        return $this->runWithReplicas(function ($driver) {
+            $driver->set(1);
+            return [$this->assertEquals(1, $driver->get())];
+        });
     }
 
-    public function set()
+    /** @return Result[] Presence reflects any available replica */
+    public function exists(): array
     {
-        $this->object->set(1);
-        return [
-            $this->assertEquals(1, $this->readValue('myClient1')),
-            $this->assertEquals(1, $this->readValue('myClient2'))
-        ];
+        return $this->runWithReplicas(function ($driver, $schemas) {
+            $results = [$this->assertFalse($driver->exists())];
+            $driver->set(1);
+            unlink($schemas[0].'/a_b.json');
+            $results[] = $this->assertTrue($driver->exists());
+            return $results;
+        });
     }
 
-
-    public function get()
+    /** @return Result[] Counter increments are copied to both replicas */
+    public function increment(): array
     {
-        return $this->assertEquals(1, $this->object->get());
+        return $this->runWithReplicas(function ($driver, $schemas) {
+            $driver->set(1);
+            $results = [$this->assertEquals(3, $driver->increment(2))];
+            foreach ($schemas as $schema) {
+                $results[] = $this->assertEquals(3, json_decode(file_get_contents($schema.'/a_b.json'), true));
+            }
+            return $results;
+        });
     }
 
-    public function getRepairsCorruptedReplica()
+    /** @return Result[] Counter decrements are copied to both replicas */
+    public function decrement(): array
     {
-        $this->object->set(1);
-        file_put_contents(__DIR__."/myClient1/a_b.json", "{");
-        $value = $this->object->get();
-        $repaired = json_decode(file_get_contents(__DIR__."/myClient1/a_b.json"), true);
-        $this->object->delete();
-        return [
-            $this->assertEquals(1, $value),
-            $this->assertEquals(1, $repaired)
-        ];
+        return $this->runWithReplicas(function ($driver, $schemas) {
+            $driver->set(5);
+            $results = [$this->assertEquals(3, $driver->decrement(2))];
+            foreach ($schemas as $schema) {
+                $results[] = $this->assertEquals(3, json_decode(file_get_contents($schema.'/a_b.json'), true));
+            }
+            return $results;
+        });
     }
 
-
-    public function exists()
+    /** @return Result[] Deletion tolerates an absent replica and clears the others */
+    public function delete(): array
     {
-        return $this->assertTrue($this->object->exists());
+        return $this->runWithReplicas(function ($driver, $schemas) {
+            $driver->set(1);
+            unlink($schemas[0].'/a_b.json');
+            $driver->delete();
+            return [
+                $this->assertFalse($driver->exists()),
+                $this->assertFileNotExists($schemas[0].'/a_b.json'),
+                $this->assertFileNotExists($schemas[1].'/a_b.json')
+            ];
+        });
     }
 
-
-    public function increment()
+    /** @return Result[] Reads repair both malformed and absent replica files */
+    public function getRepairsReplicas(): array
     {
-        return [
-            $this->assertEquals(2, $this->object->increment()),
-            $this->assertEquals(2, $this->object->get())
-        ];
+        return $this->runWithReplicas(function ($driver, $schemas) {
+            $results = [];
+            foreach (['corrupted', 'missing'] as $condition) {
+                $driver->set(1);
+                if ($condition === 'corrupted') {
+                    file_put_contents($schemas[0].'/a_b.json', '{');
+                } else {
+                    unlink($schemas[0].'/a_b.json');
+                }
+                $results[] = $this->assertEquals(1, $driver->get(), $condition);
+                $results[] = $this->assertEquals(1, json_decode(file_get_contents($schemas[0].'/a_b.json'), true), 'repaired '.$condition);
+            }
+            return $results;
+        });
     }
 
-
-    public function decrement()
+    /** @return Result[] Operations requiring an entry reject an entirely absent key */
+    public function rejectsMissingKey(): array
     {
-        return [
-            $this->assertEquals(1, $this->object->decrement()),
-            $this->assertEquals(1, $this->object->get())
-        ];
+        return $this->runWithReplicas(function ($driver) {
+            $results = [];
+            foreach (['get', 'increment', 'decrement', 'delete'] as $method) {
+                $error = null;
+                try {
+                    $driver->{$method}();
+                } catch (KeyNotFoundException $exception) {
+                    $error = $exception;
+                }
+                $results[] = $this->assertInstanceOf(KeyNotFoundException::class, $error, $method);
+            }
+            return $results;
+        });
     }
 
-
-    public function delete()
+    /** @return Result[] Malformed JSON on every replica raises a decoding failure */
+    public function rejectsCorruptedReplicas(): array
     {
-        $this->object->delete();
-        return [
-            $this->assertFalse($this->object->exists()),
-            $this->assertFileNotExists(__DIR__."/myClient1/a_b.json"),
-            $this->assertFileNotExists(__DIR__."/myClient2/a_b.json")
-        ];
+        return $this->runWithReplicas(function ($driver, $schemas) {
+            foreach ($schemas as $schema) {
+                file_put_contents($schema.'/a_b.json', '{');
+            }
+            $error = null;
+            try {
+                $driver->get();
+            } catch (\JsonException $exception) {
+                $error = $exception;
+            }
+            return [$this->assertInstanceOf(\JsonException::class, $error)];
+        });
     }
 
-    private function readValue(string $folder): mixed
+    /**
+     * Creates and cleans up two replica folders around one callback.
+     *
+     * @param callable(ValueDriver, string[]): Result[] $test Callback receiving a driver and its schema paths
+     * @return Result[] Assertions returned by the callback
+     */
+    private function runWithReplicas(callable $test): array
     {
-        $filename = __DIR__."/".$folder."/a_b.json";
-        if (!file_exists($filename)) {
-            return null;
+        $directory = sys_get_temp_dir().'/lucinda-value-tests-'.bin2hex(random_bytes(8));
+        mkdir($directory);
+        $schemas = [$directory.'/first', $directory.'/second'];
+        try {
+            foreach ($schemas as $schema) {
+                mkdir($schema);
+            }
+            return $test(new ValueDriver($schemas, ['b', 'a']), $schemas);
+        } finally {
+            foreach ($schemas as $schema) {
+                if (is_dir($schema)) {
+                    foreach (glob($schema.'/*') as $file) {
+                        unlink($file);
+                    }
+                    rmdir($schema);
+                }
+            }
+            rmdir($directory);
         }
-
-        return json_decode(file_get_contents($filename), true);
     }
 }

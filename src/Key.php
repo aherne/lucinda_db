@@ -3,17 +3,29 @@
 namespace Lucinda\DB;
 
 /**
- * Encapsulates key in KV store based on composing tags
+ * Derives a deterministic entry key from validated tags
+ *
+ * At least one tag is required. Each tag consists of lowercase ASCII letters,
+ * digits, or hyphens. Tags are sorted and joined with underscores so the same
+ * unordered list produces the same filename stem. Repeated tags are preserved.
+ *
+ * This object produces the stem only; Value appends the .json extension.
+ *
+ * @see Value
+ * @see KeyException
  */
 final class Key
 {
+    /**
+     * Canonical filename stem generated during construction
+     */
     private string $value;
 
     /**
-     * Constructs key based on composing tags
+     * Validates and sorts tags to build an immutable key
      *
-     * @param  string[] $tags List of tags key is composed of
-     * @throws KeyException
+     * @param string[] $tags Nonempty collection of supported tag strings
+     * @throws KeyException If the collection is empty or a tag contains unsupported characters
      */
     public function __construct(array $tags)
     {
@@ -21,10 +33,10 @@ final class Key
     }
 
     /**
-     * Creates key name based on composing tags
+     * Validates each tag and stores their sorted underscore-joined representation
      *
-     * @param  string[] $tags List of tags key is composed of
-     * @throws KeyException If one of tags is not alphanumeric
+     * @param string[] $tags Tags from which to derive the filename stem
+     * @throws KeyException If no tags are supplied or a tag fails validation
      */
     private function setValue(array $tags): void
     {
@@ -49,9 +61,9 @@ final class Key
     }
 
     /**
-     * Gets key name created
+     * Gets the canonical filename stem without the .json suffix
      *
-     * @return string
+     * @return string Sorted tags joined with underscores
      */
     public function getValue(): string
     {

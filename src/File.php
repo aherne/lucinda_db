@@ -3,17 +3,38 @@
 namespace Lucinda\DB;
 
 /**
- * Encapsulates a json file and its operations
+ * Reads and mutates one JSON file using a separate process-shared mutex
+ *
+ * Reads decode JSON into PHP arrays and scalar values without locking. Mutations
+ * acquire a nonblocking exclusive flock on a temporary-directory lock file derived
+ * from the supplied path string. Contention raises LockException immediately.
+ *
+ * Writes encode first, create a temporary file beside the destination, then rename
+ * it into place. update() holds the mutex across read, callback, and replacement.
+ * The mutex file is retained after release. Callers must use consistent path
+ * spellings to coordinate access to the same physical file.
+ *
+ * @see FileUpdater
+ * @see LockException
  */
 final class File
 {
+    /**
+     * Filesystem path to the JSON entry
+     */
     private string $path;
+
+    /**
+     * Stable mutex filename derived from the supplied entry path
+     */
     private string $lockPath;
 
     /**
-     * Constructs file by absolute path.
+     * Binds JSON operations and their mutex to a filesystem path
      *
-     * @param string $path Absolute path.
+     * Construction does not create the file or its parent directory.
+     *
+     * @param string $path Entry filename; consistent absolute paths are recommended
      */
     public function __construct(string $path)
     {
@@ -22,11 +43,12 @@ final class File
     }
 
     /**
-     * Writes file to disk
+     * Encodes and replaces the entry while holding its exclusive mutex
      *
-     * @param  mixed $value Value to save as JSON
-     * @throws \JsonException If value could not be encoded
-     * @throws LockException If mutex could not be acquired.
+     * @param mixed $value JSON-encodable PHP value
+     * @throws \JsonException If encoding fails
+     * @throws LockException If the mutex cannot be opened or acquired
+     * @throws \RuntimeException If creating, writing, or replacing the temporary file fails
      */
     public function write(mixed $value): void
     {
@@ -37,9 +59,9 @@ final class File
     }
 
     /**
-     * Checks if file exists
+     * Checks whether the supplied path currently exists
      *
-     * @return bool
+     * @return bool True when PHP reports an existing filesystem path
      */
     public function exists(): bool
     {
@@ -47,10 +69,13 @@ final class File
     }
 
     /**
-     * Reads file and returns value
+     * Reads JSON without taking the mutation mutex
      *
-     * @return mixed
-     * @throws \JsonException If value could not be decoded
+     * JSON objects decode as associative arrays. Callers should check existence first;
+     * missing or unreadable files may also produce filesystem warnings.
+     *
+     * @return mixed Decoded JSON value
+     * @throws \JsonException If file contents are not valid JSON
      */
     public function read(): mixed
     {
@@ -58,14 +83,16 @@ final class File
     }
 
     /**
-     * Updates value in file by callback using exclusive lock to insure writes synchronization
+     * Runs an updater against the decoded value under one exclusive mutex
      *
-     * WARNING: this operation is protected by a mutex, but in order to to prevent deadlocks it doesn't wait
-     * if mutex could not be acquired
+     * A missing or empty file starts as an empty array. The callback receives the value
+     * by reference; replacement occurs only if it returns true. A false result leaves
+     * the stored bytes untouched.
      *
-     * @param  FileUpdater $callback Encapsulates algorithm of file value update
-     * @throws \JsonException If value could not be decoded
-     * @throws LockException If mutex could not be acquired.
+     * @param FileUpdater $callback Algorithm deciding and applying the value change
+     * @throws \JsonException If existing data cannot be decoded or the result encoded
+     * @throws LockException If the mutex cannot be opened or acquired
+     * @throws \RuntimeException If writing the changed value fails
      */
     public function update(FileUpdater $callback): void
     {
@@ -85,7 +112,11 @@ final class File
     }
 
     /**
-     * Deletes file from disk
+     * Deletes the entry if present while holding its exclusive mutex
+     *
+     * Deleting an absent file is harmless. The separate mutex file remains on disk.
+     *
+     * @throws LockException If the mutex cannot be opened or acquired
      */
     public function delete(): void
     {
@@ -97,10 +128,13 @@ final class File
     }
 
     /**
-     * Runs a callback while holding the file mutex.
+     * Executes a callback while owning a nonblocking exclusive flock
      *
-     * @param callable $callback
-     * @throws LockException If mutex could not be acquired.
+     * Releases the lock and closes its handle even when the callback throws.
+     *
+     * @param callable(): void $callback Mutation to execute inside the critical section
+     * @throws LockException If opening or acquiring the mutex fails
+     * @throws \Throwable If the callback fails
      */
     private function withLock(callable $callback): void
     {
@@ -126,9 +160,14 @@ final class File
     }
 
     /**
-     * Writes already encoded JSON atomically.
+     * Replaces the destination using a temporary file in the same directory
      *
-     * @param string $json
+     * The caller must already hold the mutex. Temporary files are removed on failure;
+     * renaming provides replacement visibility without exposing an intermediate JSON
+     * payload to readers. This does not guarantee durability across a system crash.
+     *
+     * @param string $json Complete JSON text already encoded by the caller
+     * @throws \RuntimeException If temporary-file creation, writing, or replacement fails
      */
     private function writeEncoded(string $json): void
     {
