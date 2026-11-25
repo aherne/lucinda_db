@@ -140,6 +140,8 @@ A read uses the first decodable copy; it does not compare versions or elect a ma
 
 Writes create a temporary file beside the destination and rename it into place. `File::update(FileUpdater $callback)` holds the mutex across decoding, callback execution, and replacement. The callback receives the decoded value by reference and returns `true` to persist it or `false` to leave the file unchanged.
 
+An update requires an existing, readable file containing valid JSON. Missing or unreadable files raise `RuntimeException`; empty or malformed contents raise `JsonException`. These failures occur before the updater runs and leave the entry untouched. To initialize an entry or index, explicitly call `write($initialValue)` first. JSON values such as `0`, `[]`, and `{}` are valid existing contents.
+
 Each replica mutation is separate. Replica-wide writes and counters are not transactions, and a failure can leave only some copies updated. Schema maintenance, imports, and deletion algorithms use direct filesystem operations without these entry mutexes.
 
 ## Schema Operations
@@ -246,7 +248,7 @@ Errors go to stderr with exit status one:
 | `KeyNotFoundException` | Required entry is absent within the operation's storage scope |
 | `LockException` | Entry mutex could not be opened or immediately acquired |
 | `JsonException` | Value cannot be encoded or stored JSON cannot be decoded |
-| `RuntimeException` | Atomic replacement cannot create, write, or rename its temporary file |
+| `RuntimeException` | An update cannot read its existing file, or atomic replacement cannot create, write, or rename its temporary file |
 
 Filesystem and XML functions may also emit PHP warnings. Health checks and maintenance operations do not convert all I/O failures into domain exceptions.
 

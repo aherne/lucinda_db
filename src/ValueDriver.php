@@ -124,7 +124,7 @@ final class ValueDriver implements ValueOperations
      * @throws KeyNotFoundException If the first replica has no entry
      * @throws \JsonException If JSON conversion fails
      * @throws LockException If a mutation mutex cannot be acquired
-     * @throws \RuntimeException If a replica write fails
+     * @throws \RuntimeException If reading the first replica or writing a replica fails
      */
     public function increment(int $step = 1): int
     {
@@ -151,7 +151,7 @@ final class ValueDriver implements ValueOperations
      * @throws KeyNotFoundException If the first replica has no entry
      * @throws \JsonException If JSON conversion fails
      * @throws LockException If a mutation mutex cannot be acquired
-     * @throws \RuntimeException If a replica write fails
+     * @throws \RuntimeException If reading the first replica or writing a replica fails
      */
     public function decrement(int $step = 1): int
     {

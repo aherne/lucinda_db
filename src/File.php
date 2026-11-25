@@ -85,25 +85,25 @@ final class File
     /**
      * Runs an updater against the decoded value under one exclusive mutex
      *
-     * A missing or empty file starts as an empty array. The callback receives the value
-     * by reference; replacement occurs only if it returns true. A false result leaves
-     * the stored bytes untouched.
+     * Requires an existing, readable file containing valid JSON. Missing or
+     * unreadable files raise an I/O exception; empty or malformed contents raise
+     * a JSON exception. Validation runs under the mutex before the callback.
+     * The callback receives the value by reference; replacement occurs only if
+     * it returns true. A false result leaves the stored bytes untouched.
      *
      * @param FileUpdater $callback Algorithm deciding and applying the value change
      * @throws \JsonException If existing data cannot be decoded or the result encoded
      * @throws LockException If the mutex cannot be opened or acquired
-     * @throws \RuntimeException If writing the changed value fails
+     * @throws \RuntimeException If reading the existing file or writing the changed value fails
      */
     public function update(FileUpdater $callback): void
     {
         $this->withLock(function () use ($callback) {
-            $json = [];
-            if ($this->exists()) {
-                $contents = file_get_contents($this->path);
-                if ($contents !== false && $contents !== "") {
-                    $json = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-                }
+            $contents = @file_get_contents($this->path);
+            if ($contents === false) {
+                throw new \RuntimeException("Could not read file for update: ".$this->path);
             }
+            $json = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
             $changed = $callback->update($json);
             if ($changed) {
                 $this->writeEncoded(json_encode($json, JSON_THROW_ON_ERROR));

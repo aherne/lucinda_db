@@ -92,7 +92,7 @@ final class Value implements ValueOperations
      * @throws KeyNotFoundException If the entry does not exist
      * @throws \JsonException If reading or encoding fails
      * @throws LockException If the entry mutex cannot be acquired
-     * @throws \RuntimeException If the updated file cannot be replaced
+     * @throws \RuntimeException If the existing file cannot be read or the updated file cannot be replaced
      */
     public function increment(int $step = 1): int
     {
@@ -115,7 +115,7 @@ final class Value implements ValueOperations
      * @throws KeyNotFoundException If the entry does not exist
      * @throws \JsonException If reading or encoding fails
      * @throws LockException If the entry mutex cannot be acquired
-     * @throws \RuntimeException If the updated file cannot be replaced
+     * @throws \RuntimeException If the existing file cannot be read or the updated file cannot be replaced
      */
     public function decrement(int $step = 1): int
     {

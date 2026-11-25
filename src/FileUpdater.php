@@ -7,7 +7,8 @@ namespace Lucinda\DB;
  *
  * The updater receives a decoded JSON value by reference. Returning true asks File
  * to encode and persist the changed value; false leaves the stored file untouched.
- * A missing or empty file is supplied as an empty array.
+ * File validates the existing JSON before invoking the updater. Missing,
+ * unreadable, empty, or malformed files are rejected without invoking it.
  *
  * @see File
  */
